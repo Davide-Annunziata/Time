@@ -18,7 +18,7 @@ export default class Level1 extends Phaser.Scene {
     private textContinua: Phaser.GameObjects.BitmapText;
     private textEsci: Phaser.GameObjects.BitmapText;
     public completed:boolean;
-
+    private bg:Phaser.GameObjects.Image;
     
   //i due riferimenti alla mappa di tile e al tileset
 	private map: Phaser.Tilemaps.Tilemap;
@@ -44,6 +44,8 @@ export default class Level1 extends Phaser.Scene {
         this.music.play();
         this.groupBomb = this.add.group();
         this.map = this.make.tilemap({ key: "level-1"});
+        this.bg=this.add.image(0, 0,"bg1").setOrigin(0,0).setDepth(0);
+   
 
         this.mainCam = this.cameras.main;
         this.mainCam.setBounds(
