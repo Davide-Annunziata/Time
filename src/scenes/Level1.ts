@@ -19,7 +19,6 @@ export default class Level1 extends Phaser.Scene {
     private textEsci: Phaser.GameObjects.BitmapText;
     public completed:boolean;
     private bg:Phaser.GameObjects.Image;
-    
   //i due riferimenti alla mappa di tile e al tileset
 	private map: Phaser.Tilemaps.Tilemap;
 	private tileset: Phaser.Tilemaps.Tileset;
@@ -27,6 +26,7 @@ export default class Level1 extends Phaser.Scene {
 	private layer: Phaser.Tilemaps.TilemapLayer;
   //in layer 2 il livello per la gestione delle collisioni pavimento e piattaforme	
 	private layer2: Phaser.Tilemaps.TilemapLayer;
+
 
     constructor() {
         super({
@@ -40,7 +40,7 @@ export default class Level1 extends Phaser.Scene {
         }
         this.player= new Player({ scene: this, x: 100, y: 500, key: "player" });
         this.physics.add.existing(this.player);
-        this.music=this.sound.add("music0",{loop:true,volume:0.1});
+        this.music=this.sound.add("music0",{loop:true,volume:1});
         this.music.play();
         this.groupBomb = this.add.group();
         this.map = this.make.tilemap({ key: "level-1"});
