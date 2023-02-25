@@ -149,10 +149,9 @@ export default class Level1 extends Phaser.Scene {
         .setOrigin(0.5,0.5)
         .setTint(0x0000)
         .setInteractive()
-        .on("pointerdown",()=>{this.scene.remove,this.scene.start("LevelSelection")});
-        this.esci=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+80,"rettangolo").setInteractive().on("pointerdown",()=>{console.log(2)}).setOrigin(0.5,0.5).setDepth(9);
-        
-        this.HUD.add([this.base,this.continua,this.textMenu,this.textContinua,this.textEsci,this.esci]);
+        .on("pointerdown",()=>{this.scene.remove,this.scene.start("LevelSelection");this.music.destroy()});
+  
+        this.HUD.add([this.base,this.continua,this.textMenu,this.textContinua,this.textEsci]);
         this.HUD.setAlpha(0).setDepth(100);
     }
 }

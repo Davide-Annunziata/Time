@@ -40,7 +40,7 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
 		this._scene.physics.world.enable(this);
 		
 		this._body = <Phaser.Physics.Arcade.Body>this.body;
-        this._body.setAllowGravity(true).setGravityY(200);
+        this._body.setAllowGravity(true).setAccelerationY(130).setGravityY(200);
 	
 		this._body.setCollideWorldBounds(true).setSize(46,68);
 		this._cursors = this._scene.input.keyboard.createCursorKeys();
@@ -69,7 +69,7 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
     update(time: number, delta: number) {
         if(this.scene!=undefined&&!this.pause){
             if (this._cursors.left.isDown) {
-                this._body.setAccelerationY(150);
+                this._body.setAccelerationY(130).setGravityY(200);
                 this.right=false;
                 this.setFlipX(true);
                 //effettua il play dell'animazione
@@ -79,7 +79,7 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
                 }
             //se il il cursore destro è premuto
             if (this._cursors.right.isDown) {
-                this._body.setAccelerationY(150);
+                this._body.setAccelerationY(130).setGravityY(200);
                 this.right=true;
                 this.setFlipX(false);
                 //effettua il play dell'animazione
@@ -90,7 +90,7 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
             
             //se il il cursore in alto è premuto
             if (this._cursors.up.isDown) {
-                this._body.setAccelerationY(150);
+                this._body.setAccelerationY(130).setGravityY(200);
                 //effettua il play dell'animazione
                 this.anims.play('move', true);
                 //setta la velocità x in modo da far muovere il player
@@ -98,12 +98,10 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
             if (this._cursors.down.isDown) {
             }
 
-            
             if (!this._cursors.left.isDown && !this._cursors.right.isDown && !this._cursors.up.isDown && !this._cursors.down.isDown) {                  
-                this._body.setVelocity(0);                
+                this._body.setVelocity(0,200).setGravityY(200);                
                 this.anims.play('idle', true);
-                this._body.setAccelerationY(10000);
-                
+
             }
         }
     }
