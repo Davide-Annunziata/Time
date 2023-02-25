@@ -28,7 +28,14 @@ export let GameData: any = {
       height: 32,
       spacing: 2,
       margin: 1,
+    },{	
+      name: "bonus",
+      path: "assets/images/bonus-coin.png",
+      width: 64,
+      height: 64,
+      frames: 8
     }
+    
   ]
 ,
   images: [
@@ -61,6 +68,10 @@ export let GameData: any = {
 		{
 		key: "level-1",
 		path: "assets/map/level-1.json",
-		}
+		},
+    {
+      key: "level-2",
+      path: "assets/map/level-2.json",
+      }
 	],
 };

@@ -1,5 +1,7 @@
 import GamePlay from "./GamePlay";
 import Player from "../components/Player";
+import Bonus from "../components/Bonus";
+import Bcoin from "../components/Bcoin";
 
 export default class Level2 extends Phaser.Scene {
     private mainCam:Phaser.Cameras.Scene2D.Camera;
@@ -22,6 +24,9 @@ export default class Level2 extends Phaser.Scene {
   //in layer 2 il livello per la gestione delle collisioni pavimento e piattaforme	
 	private layer2: Phaser.Tilemaps.TilemapLayer;
     private keyEsc:any;
+    private groupBonus: Phaser.GameObjects.Group;
+    private points:integer;
+    private textPoints:Phaser.GameObjects.BitmapText;
 
     constructor() {
         super({
@@ -30,12 +35,18 @@ export default class Level2 extends Phaser.Scene {
     }
 
     preload() {      
-        this.player= new Player({ scene: this, x: 100, y: 500, key: "player" });
+        this.player= new Player({ scene: this, x: 80, y: 870, key: "player" });
         this.physics.add.existing(this.player);
         this.music=this.sound.add("music2",{loop:true,volume:0.1});
         this.music.play();
-        this.map = this.make.tilemap({ key: "level-1"});
+        this.map = this.make.tilemap({ key: "level-2"});
         this.keyEsc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+        this.points=0;
+        this.textPoints=this.add.bitmapText(this.cameras.main.worldView.x+30,this.cameras.main.worldView.y+50, "arcade", "Punti: "+this.points, 24)
+        .setAlpha(1)
+        .setDepth(100)
+        .setOrigin(0.5,0.5)
+        .setTint(0x0000);
 
         this.mainCam = this.cameras.main;
         this.mainCam.setBounds(
@@ -69,14 +80,23 @@ export default class Level2 extends Phaser.Scene {
         this.layer2.setCollisionByProperty({collide: true });
         
         this.physics.add.collider(this.player,this.layer2,(_player: any, _tile: any) => {
-            this.jmp=true;
+            if(this.player._body.blocked.down){
+                this.jmp=true;
+            }
                 if (_tile.properties.exit == true) {				
                     console.log("level completed");
                     this.completed=true;
                     this.scene.start("LevelSelection");
                 }
             },undefined,this
-        );   
+        );
+        this.groupBonus = this.add.group({ runChildUpdate: true });
+
+        this.physics.add.collider(this.player, this.groupBonus,(player: any, bonus: any)=>{
+            bonus.destroy();
+            this.points+=1
+        }, undefined, this);
+
     }
 
     create() {
@@ -101,6 +121,7 @@ export default class Level2 extends Phaser.Scene {
             this.player._body.setAllowGravity(true)
             this.player._body.allowGravity=true;
         }
+        this.changePoint();
     }
 
     jump():void{
@@ -145,4 +166,40 @@ export default class Level2 extends Phaser.Scene {
         this.HUD.add([this.base,this.continua,this.textMenu,this.textContinua,this.textEsci]);
         this.HUD.setAlpha(0).setDepth(100);
     }
+
+    changePoint(){
+        this.textPoints.destroy();
+        this.textPoints=this.add.bitmapText(this.cameras.main.worldView.x+130,this.cameras.main.worldView.y+50, "arcade", "Punti: "+this.points, 18)
+        .setAlpha(1)
+        .setDepth(100)
+        .setOrigin(0.5,0.5)
+        .setTint(0x0000);
+    }
+
+    addBonus(bonus: Bonus) {
+        this.groupBonus.add(bonus);
+    }
+
+    removeBonus(bonus: Bonus) {
+        this.groupBonus.remove(bonus, true, true);
+    }
+
+    setupObjects(): void {
+		//recuperiamo il layer object dalla mappa di TILED
+		let _objLayer: Phaser.Tilemaps.ObjectLayer = this.map.getObjectLayer("gameObjects");
+		// controlliamo che _objLayer non sia null
+		 if (_objLayer != null) {
+			// recuperiamo gli objects all'interno del layer
+			let _objects: any = _objLayer.objects as any[];
+            console.log(_objects);
+			// cicliamo l'array
+			_objects.forEach((tile: Phaser.Tilemaps.Tile) => {
+			    //convertiamo la property in un oggetto al quale possiamo accedere
+                this.addBonus(new Bcoin({ scene: this,  x: tile.x, y: tile.y, key: "bonus-coin" })); 
+			});
+		}else{
+            console.log(2);
+        }
+	}
+
 }

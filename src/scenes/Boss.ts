@@ -32,6 +32,7 @@ export default class Boss extends Phaser.Scene {
     private shot:boolean;
     private win:boolean;
     private triggered:boolean
+    private cloud: Phaser.GameObjects.Image;
     constructor() {
         super({
         key: "Boss",
@@ -58,7 +59,7 @@ export default class Boss extends Phaser.Scene {
             this.map.heightInPixels //height
             );
         this.mainCam.startFollow(this.player);
-        
+        this.cloud=this.physics.add.image(90,655,"logo-game").setOrigin(0.5,0.5).setDepth(12).setScale(0.4).setAlpha(0).setImmovable(true);
     
         this.physics.world.setBounds(
             0, //x
@@ -84,7 +85,9 @@ export default class Boss extends Phaser.Scene {
         this.layer2.setCollisionByProperty({collide: true });
         
         this.physics.add.collider(this.player,this.layer2,(_player: any, _tile: any) => {
-            this.jmp=true;
+            if(this.player._body.blocked.down){
+                this.jmp=true;
+            }
                 if (_tile.properties.exit == true) {				
                     console.log("level completed");
                     this.completed=true;
@@ -95,7 +98,7 @@ export default class Boss extends Phaser.Scene {
 
         this.physics.add.collider(this.groupProj,this.boss,(proj: any, boss: any) => {	
             proj.destroy();
-            boss.life-=5;
+            boss.life-=50;
             console.log(this.boss.life);
             },undefined,this
         );
@@ -125,6 +128,8 @@ export default class Boss extends Phaser.Scene {
             },undefined,this
         );
         
+        this.physics.add.collider(this.player,this.cloud,(obj1: any, obj2: any) => {if(this.player._body.blocked.down){this.jmp=true; } },undefined,this);
+
         this.time.addEvent({
             delay: 3000, loop: true, callback: () => {
                 if(this.boss.life>0&&!this.player.pause&&!this.triggered){
@@ -155,6 +160,9 @@ export default class Boss extends Phaser.Scene {
         this.player.update(time,delta);
         if(this.boss.life<=0){
             this.boss.destroy();
+            if(!this.win){
+                this.createCloud();
+            }
             this.win=true;
         }
         this.jump();
@@ -250,4 +258,24 @@ export default class Boss extends Phaser.Scene {
         this.groupThunder.add(thunder);
     }
 
+    createCloud(){
+        this.cloud.setAlpha(1);
+        this.tweens.add({
+        targets: this.cloud,
+        duration: 4000,
+        repeat: -1,
+        ease: "Linear",
+        y: 300,
+        onComplete: () => {
+            this.tweens.add({
+                targets: this.cloud,
+                duration: 100,
+                repeat: 1,
+                ease: "Linear",
+                y: 650,   
+            });
+          }    
+        });
+
+    }
 }
