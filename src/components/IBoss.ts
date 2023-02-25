@@ -1,5 +1,5 @@
-interface IProj {
+interface IBoss {
     create(): void;
     update(time: number, delta: number): void;
 }
-export default IProj;
+export default IBoss;

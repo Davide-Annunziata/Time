@@ -40,9 +40,20 @@ export let GameData: any = {
     { name: "base", path: "assets/images/base.png" }
   ],
   atlas: [],
-  sounds: [
-    {name: "music0",
-      paths: ["assets/sounds/music0.ogg", "assets/sounds/music0.m4a"],}
+  sounds: [{
+      name: "music1",
+      paths: ["assets/sounds/music1.ogg", "assets/sounds/music1.m4a"],
+    },{
+      name: "music2",
+      paths: ["assets/sounds/music2.ogg", "assets/sounds/music2.m4a"],
+    },{
+      name: "music3",
+      paths: ["assets/sounds/music3.ogg", "assets/sounds/music3.m4a"],
+    },
+    {
+      name: "music4",
+      paths: ["assets/sounds/music4.ogg", "assets/sounds/music4.m4a"],
+    },
   ],
   audio: [],
   bitmapfont: [],

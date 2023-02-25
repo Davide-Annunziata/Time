@@ -1,7 +1,6 @@
 import IPlayer from "./IPlayer";
 //Importiamo la scena di gameplay in modo da potervi accedere
 import GamePlay from "../scenes/GamePlay";
-import Proj from "../components/Proj";
 
 export default class Player extends Phaser.GameObjects.Sprite implements IPlayer {
 	private _config: genericConfig;
@@ -9,7 +8,7 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
 	private _scene: GamePlay;
 	//variabile locale di tipo arcade.body per poter accedere ai metodi del Body
 	// descritti nel capitolo 7
-	private _body: Phaser.Physics.Arcade.Body;
+	public _body: Phaser.Physics.Arcade.Body;
 	//variabile locale per la gestione dei tasti cursore come visto nel capitolo 6
 	public _cursors: Phaser.Types.Input.Keyboard.CursorKeys;
 	//variabile locale per impostare la velocità del body
@@ -21,8 +20,7 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
 	{ key: "idle", frames: [8,9,10,11,12,13], frameRate: 10, yoyo: false, repeat: -1 }
 	];
 
-    private right:boolean;
-    private groupProj:Phaser.GameObjects.Group;
+    public right:boolean;
 
     constructor(params: genericConfig) {
             super(params.scene, params.x, params.y+20, params.key);
@@ -36,6 +34,7 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
             }
 
 	create() {
+        this.right=true;
 		this._scene = <GamePlay>this._config.scene;
 
 		this._scene.physics.world.enable(this);
@@ -45,10 +44,9 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
 	
 		this._body.setCollideWorldBounds(true).setSize(46,68);
 		this._cursors = this._scene.input.keyboard.createCursorKeys();
-		this.setDepth(11);
+		this.setDepth(4);
 		this.pause=false;
 		this._scene.add.existing(this);
-        this.groupProj= this.scene.add.group();
 	}
 	
 	createAnimations() {
@@ -69,7 +67,6 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
 
 	}
     update(time: number, delta: number) {
-        this.setDepth(this.y);
         if(this.scene!=undefined&&!this.pause){
             if (this._cursors.left.isDown) {
                 this._body.setAccelerationY(150);
@@ -100,34 +97,15 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
             }
             if (this._cursors.down.isDown) {
             }
-            if (this._cursors.space.isDown) {
-                //setta la velocità x in modo da far muovere il player
-                this.createProj();
-            }
-             
 
             
             if (!this._cursors.left.isDown && !this._cursors.right.isDown && !this._cursors.up.isDown && !this._cursors.down.isDown) {                  
                 this._body.setVelocity(0);                
                 this.anims.play('idle', true);
-                this._body.setAccelerationY(20000);
+                this._body.setAccelerationY(10000);
                 
             }
         }
     }
 
-    getGroupProj():Phaser.GameObjects.Group{
-        return this.groupProj;
-    }
-    createProj(){
-        if(this.right){ 
-            let proj = new Proj({scene: this.scene, x: this._body.x+30, y: this._body.y+10, key: "player" },this.right);
-            this.groupProj.add(proj);
-        }else{
-            let proj = new Proj({scene: this.scene, x: this._body.x-10, y: this._body.y+20, key: "player" },this.right);
-            proj.setOrigin(1,1).setDepth(9);
-            this.groupProj.add(proj);
-        }
-        
-    }
 }

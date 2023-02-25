@@ -3,8 +3,7 @@ import GamePlay from "./GamePlay";
 import Player from "../components/Player";
 
 export default class Level1 extends Phaser.Scene {
-    private groupBomb:Phaser.GameObjects.Group;
-    private skel:Phaser.GameObjects.Image;
+   
 
     private mainCam:Phaser.Cameras.Scene2D.Camera;
     private player:Player;
@@ -26,7 +25,7 @@ export default class Level1 extends Phaser.Scene {
 	private layer: Phaser.Tilemaps.TilemapLayer;
   //in layer 2 il livello per la gestione delle collisioni pavimento e piattaforme	
 	private layer2: Phaser.Tilemaps.TilemapLayer;
-
+    private keyEsc:any;
 
     constructor() {
         super({
@@ -40,12 +39,11 @@ export default class Level1 extends Phaser.Scene {
         }
         this.player= new Player({ scene: this, x: 100, y: 500, key: "player" });
         this.physics.add.existing(this.player);
-        this.music=this.sound.add("music0",{loop:true,volume:1});
+        this.music=this.sound.add("music1",{loop:true,volume:.4});
         this.music.play();
-        this.groupBomb = this.add.group();
         this.map = this.make.tilemap({ key: "level-1"});
         this.bg=this.add.image(0, 0,"bg1").setOrigin(0,0).setDepth(0);
-   
+        this.keyEsc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
 
         this.mainCam = this.cameras.main;
         this.mainCam.setBounds(
@@ -62,18 +60,18 @@ export default class Level1 extends Phaser.Scene {
             0, //y
             this.map.widthInPixels, //width
             this.map.heightInPixels //height
-        );
-        
+        );  
         this.jmp=true;
+
         this.tileset = this.map.addTilesetImage("tilemap-extruded");
         this.layer = this.map
 	    .createLayer("world", this.tileset, 0, 0)
-	    .setDepth(9)
+	    .setDepth(3)
 	    .setAlpha(1);
 
         this.layer2 = this.map
         .createLayer("collision", this.tileset, 0, 0)
-        .setDepth(0)
+        .setDepth(1)
         .setAlpha(1);
 
         this.layer2.setCollisionByProperty({collide: true });
@@ -87,30 +85,7 @@ export default class Level1 extends Phaser.Scene {
                 }
             },undefined,this
         );
-
-        this.physics.add.collider(this.groupBomb, this.layer2, (obj1: any, obj2: any) => {
-            obj1.destroy();
-        }, undefined, this);
-
-        this.physics.add.collider(this.groupBomb, this.player, (obj1: any, obj2: any) => {
-            obj1.destroy();
-            this.mainCam.stopFollow();
-            obj2.destroy();
-            this.time.addEvent({
-                delay: 1000, loop: true, callback: () => {
-                    this.scene.restart();
-                }, callbackScope: this
-            });
-        }, undefined, this);
-
-        this.time.addEvent({
-            delay: 3000, loop: true, callback: () => {
-                this.thunder();
-                this.thunder();
-                this.thunder();
-            }, callbackScope: this
-        });
-        
+       
     }
 
     create() {
@@ -118,18 +93,23 @@ export default class Level1 extends Phaser.Scene {
         this.createHUD();
     }
 
-    thunder(){
-        let _bomb = this.physics.add.image(this.cameras.main.worldView.getRandomPoint().x,this.cameras.main.worldView.top,"thunder").setDepth(10);
-        _bomb.setOrigin(1,1).setDepth(9);
-        _bomb.body.allowGravity = false;
-        _bomb.body.setVelocityY(600);
-        this.groupBomb.add(_bomb);
-    }
-
     update(time: number, delta: number): void {
         this.player.update(time,delta);
         this.jump();
-      
+        if(this.keyEsc.isDown&&this.HUD.alpha==0){
+            this.createHUD();
+            this.player.pause=true;
+            this.player.anims.play('idle', true);
+            this.HUD.setAlpha(1);
+        }
+        if(this.player.pause&&this.player._body.allowGravity==true){                 
+            this.player._body.setVelocity(0);                
+            this.player._body.setAllowGravity(false);
+            this.player._body.allowGravity=false;
+        }else if(!this.player.pause&&!this.player._body.allowGravity){
+            this.player._body.setAllowGravity(true)
+            this.player._body.allowGravity=true;
+        }
     }
 
     jump():void{
@@ -149,31 +129,30 @@ export default class Level1 extends Phaser.Scene {
     }
     
     createHUD(){
-        this.player.pause=true;
         this.HUD=this.add.container().setAlpha(1);
-        this.base=this.add.image(this.mainCam.centerX,this.mainCam.centerY+30,"base").setOrigin(0.5,0.5).setDepth(8);
-        this.textMenu=this.add.bitmapText(this.mainCam.centerX,this.mainCam.centerY-105, "arcade", "Menu", 30)
+        this.base=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+15,"base").setOrigin(0.5,0.5).setDepth(12);
+        this.textMenu=this.add.bitmapText(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-90, "arcade", "Menu", 30)
         .setAlpha(1)
         .setDepth(10)
         .setOrigin(0.5,0.5)
         .setTint(0x0000);
-        this.textContinua=this.add.bitmapText(this.mainCam.centerX,this.mainCam.centerY-10, "arcade", "Continua", 28)
+        this.textContinua=this.add.bitmapText(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-10, "arcade", "Continua", 28)
         .setAlpha(1)
         .setDepth(10)
         .setOrigin(0.5,0.5)
         .setTint(0x0000)
         .setInteractive()
         .on("pointerdown",()=>{this.HUD.setAlpha(0);this.player.pause=false;console.log(1);});
-        this.continua=this.add.image(this.mainCam.centerX,this.mainCam.centerY-10,"rettangolo").setInteractive().on("pointerdown",()=>{this.HUD.setAlpha(0);console.log(1)}).setOrigin(0.5,0.5).setDepth(9);
-        this.textEsci=this.add.bitmapText(this.mainCam.centerX,this.mainCam.centerY+90, "arcade", "Esci", 28)
-        .setAlpha(1)
+        this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-10,"rettangolo").setInteractive().on("pointerdown",()=>{this.HUD.setAlpha(0);console.log(1);this.player.pause=false;}).setOrigin(0.5,0.5).setDepth(9);
+        this.textEsci=this.add.bitmapText(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+90, "arcade", "Esci", 28)
         .setDepth(10)
         .setOrigin(0.5,0.5)
         .setTint(0x0000)
         .setInteractive()
         .on("pointerdown",()=>{this.scene.remove,this.scene.start("LevelSelection")});
-        this.esci=this.add.image(this.mainCam.centerX,this.mainCam.centerY+80,"rettangolo").setInteractive().on("pointerdown",()=>{console.log(2)}).setOrigin(0.5,0.5).setDepth(9);
+        this.esci=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+80,"rettangolo").setInteractive().on("pointerdown",()=>{console.log(2)}).setOrigin(0.5,0.5).setDepth(9);
         
         this.HUD.add([this.base,this.continua,this.textMenu,this.textContinua,this.textEsci,this.esci]);
+        this.HUD.setAlpha(0).setDepth(100);
     }
 }

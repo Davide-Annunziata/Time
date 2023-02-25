@@ -1,7 +1,7 @@
 import GamePlay from "./GamePlay";
 import Player from "../components/Player";
 
-export default class Level2 extends Phaser.Scene {
+export default class Level3 extends Phaser.Scene {
     private mainCam:Phaser.Cameras.Scene2D.Camera;
     private player:Player;
     private music: Phaser.Sound.BaseSound;
@@ -13,7 +13,7 @@ export default class Level2 extends Phaser.Scene {
     private textMenu: Phaser.GameObjects.BitmapText;
     private textContinua: Phaser.GameObjects.BitmapText;
     private textEsci: Phaser.GameObjects.BitmapText;
-    public completed:boolean=false; 
+    public completed:boolean=false;
   //i due riferimenti alla mappa di tile e al tileset
 	private map: Phaser.Tilemaps.Tilemap;
 	private tileset: Phaser.Tilemaps.Tileset;
@@ -25,14 +25,14 @@ export default class Level2 extends Phaser.Scene {
 
     constructor() {
         super({
-        key: "Level2",
+        key: "Level3",
         });
     }
 
     preload() {      
         this.player= new Player({ scene: this, x: 100, y: 500, key: "player" });
         this.physics.add.existing(this.player);
-        this.music=this.sound.add("music2",{loop:true,volume:0.1});
+        this.music=this.sound.add("music3",{loop:true,volume:0.1});
         this.music.play();
         this.map = this.make.tilemap({ key: "level-1"});
         this.keyEsc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
@@ -76,11 +76,11 @@ export default class Level2 extends Phaser.Scene {
                     this.scene.start("LevelSelection");
                 }
             },undefined,this
-        );   
+        );
     }
 
     create() {
-        console.log("create:Level2");
+        console.log("create:Level3");
         this.createHUD();
     }
 
@@ -147,3 +147,4 @@ export default class Level2 extends Phaser.Scene {
         this.HUD.setAlpha(0).setDepth(100);
     }
 }
+
