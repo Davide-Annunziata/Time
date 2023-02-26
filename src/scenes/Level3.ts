@@ -27,6 +27,7 @@ export default class Level3 extends Phaser.Scene {
     private groupBonus: Phaser.GameObjects.Group;
     private points:integer;
     private textPoints:Phaser.GameObjects.BitmapText;
+    private zoomed:boolean;
 
     constructor() {
         super({
@@ -35,11 +36,11 @@ export default class Level3 extends Phaser.Scene {
     }
 
     preload() {      
-        this.player= new Player({ scene: this, x: 100, y: 500, key: "player" });
+        this.player= new Player({ scene: this, x:2560, y: 500, key: "player" });
         this.physics.add.existing(this.player);
         this.music=this.sound.add("music3",{loop:true,volume:0.1});
         this.music.play();
-        this.map = this.make.tilemap({ key: "level-1"});
+        this.map = this.make.tilemap({ key: "level-3"});
         this.keyEsc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
         this.points=0;
         this.textPoints=this.add.bitmapText(this.cameras.main.worldView.x+30,this.cameras.main.worldView.y+50, "arcade", "Punti: "+this.points, 24)
@@ -47,11 +48,12 @@ export default class Level3 extends Phaser.Scene {
         .setDepth(100)
         .setOrigin(0.5,0.5)
         .setTint(0x0000);
+        this.zoomed=false;
 
         this.mainCam = this.cameras.main;
         this.mainCam.setBounds(
             0, //x
-            0, //y
+            -258, //y
             this.map.widthInPixels, //width
             this.map.heightInPixels //height
             );
@@ -121,6 +123,21 @@ export default class Level3 extends Phaser.Scene {
             this.player._body.allowGravity=true;
         }
         this.changePoint();
+        if(this.player._body.position.x>3950&&this.player._body.position.y>610){
+            this.mainCam.setBounds(
+                0, //x
+                0, //y
+                this.map.widthInPixels, //width
+                this.map.heightInPixels //height
+            );
+        }else if(this.player._body.position.x<3950&&this.player._body.position.y<620){
+            this.mainCam.setBounds(
+                0, //x
+                -258, //y
+                this.map.widthInPixels, //width
+                this.map.heightInPixels //height
+                );
+        }
     }
 
     jump():void{
@@ -128,7 +145,7 @@ export default class Level3 extends Phaser.Scene {
             if (this.player._cursors.up.isDown) {
                 this.jmp=false;
                 this.tweens.add({
-                    targets: this.player,
+                targets: this.player,
                 duration: 500,
                 repeat: 0,
                 ease: "Linear",

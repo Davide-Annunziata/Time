@@ -27,6 +27,7 @@ export default class Level2 extends Phaser.Scene {
     private groupBonus: Phaser.GameObjects.Group;
     private points:integer;
     private textPoints:Phaser.GameObjects.BitmapText;
+    private bg:Phaser.GameObjects.Image;
 
     constructor() {
         super({
@@ -39,6 +40,7 @@ export default class Level2 extends Phaser.Scene {
         this.physics.add.existing(this.player);
         this.music=this.sound.add("music2",{loop:true,volume:0.1});
         this.music.play();
+        this.bg=this.add.image(0,0,"bg2").setOrigin(0,0).setDepth(0);
         this.map = this.make.tilemap({ key: "level-2"});
         this.keyEsc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
         this.points=0;

@@ -23,6 +23,7 @@ export default class Boss extends Phaser.Scene {
   //in layer 2 il livello per la gestione delle collisioni pavimento e piattaforme	
 	private layer2: Phaser.Tilemaps.TilemapLayer;
     private keyEsc:any;
+    private bg:Phaser.GameObjects.Image;
 
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     private playing:boolean;
@@ -43,6 +44,7 @@ export default class Boss extends Phaser.Scene {
         this.player= new Player({ scene: this, x: 100, y: 500, key: "player" });
         this.boss=new BossC(({ scene: this, x: 500, y: 550, key: "player" }));
         this.triggered=false;
+        this.bg=this.add.image(0, 0,"bg2").setOrigin(0,0).setDepth(0);
         this.groupProj= this.add.group();
         this.physics.add.existing(this.player);
         this.music=this.sound.add("music4",{loop:true,volume:0.4});

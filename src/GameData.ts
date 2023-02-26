@@ -41,6 +41,7 @@ export let GameData: any = {
   images: [
     {name:"logo-game", path:"assets/images/GameTitle.png"},
     {name: "bg1", path: "assets/map/sfondo1.jpg" },
+    {name: "bg2", path: "assets/map/sfondo2.jpg" },
     { name: "skel", path: "assets/images/bg/skel.png" },
     { name: "thunder", path: "assets/images/thunder.png" },
     { name: "rettangolo", path: "assets/images/rettangolo.png" },
@@ -72,6 +73,9 @@ export let GameData: any = {
     {
       key: "level-2",
       path: "assets/map/level-2.json",
-      }
+    },{
+      key: "level-3",
+      path: "assets/map/level-3.json",
+      },
 	],
 };
