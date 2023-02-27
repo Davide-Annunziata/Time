@@ -100,7 +100,7 @@ export default class Boss extends Phaser.Scene {
         .setAlpha(1);
 
         this.layer2.setCollisionByProperty({collide: true });
-        
+
         this.physics.add.collider(this.groupProj,this.boss,(proj: any, boss: any) => {	
             proj.destroy();
             boss.life-=50;
@@ -123,7 +123,7 @@ export default class Boss extends Phaser.Scene {
             },undefined,this
         );
 
-
+        this.createCollider();
         this.time.addEvent({
             delay: 3000, loop: true, callback: () => {
                 if(this.boss.life>0&&!this.player.pause&&!this.triggered){
@@ -141,16 +141,14 @@ export default class Boss extends Phaser.Scene {
                 } 
             }, callbackScope: this
         });
-
+        
         this.time.addEvent({
             delay: 1000, loop: true, callback: () => {
                 if(this.boss.life>0&&!this.player.pause&&!this.shot){
                    this.shot=true;
                 } 
             }, callbackScope: this
-        });
-
-        
+        });     
     }
 
     create() {
@@ -158,16 +156,7 @@ export default class Boss extends Phaser.Scene {
         this.createHUD();
     }
 
-    update(time: number, delta: number): void {
-        this.player.update(time,delta);
-        if(this.boss.life<=0){
-            this.boss.destroy();
-            if(!this.win){
-                this.createCloud();
-            }
-            this.win=true;
-        }
-        this.jump();
+    createCollider(){
         this.physics.add.collider(this.player,this.layer2,(_player: any, _tile: any) => {
             if(this.player._body.blocked.down){
                 this.jmp=true;
@@ -199,6 +188,7 @@ export default class Boss extends Phaser.Scene {
                     this.time.addEvent({
                         delay: 1000, loop: false, callback: () => {
                             this.player= new Player({ scene: this, x:this.posX, y: this.posY, key: "player" });
+                            this.createCollider();
                             this.player.setAlpha(1);
                             this.mainCam.startFollow(this.player);
                         }, callbackScope: this
@@ -226,6 +216,7 @@ export default class Boss extends Phaser.Scene {
                 this.time.addEvent({
                     delay: 1000, loop: false, callback: () => {
                         this.player= new Player({ scene: this, x:this.posX, y: this.posY, key: "player" });
+                        this.createCollider();
                         this.player.setAlpha(1);
                         this.mainCam.startFollow(this.player);
                     }, callbackScope: this
@@ -250,6 +241,7 @@ export default class Boss extends Phaser.Scene {
                 this.time.addEvent({
                     delay: 1000, loop: false, callback: () => {
                         this.player= new Player({ scene: this, x:this.posX, y: this.posY, key: "player" });
+                        this.createCollider();
                         this.player.setAlpha(1);
                         this.mainCam.startFollow(this.player);
                     }, callbackScope: this
@@ -264,6 +256,18 @@ export default class Boss extends Phaser.Scene {
         }, undefined, this);
         
         this.physics.add.collider(this.player,this.cloud,(obj1: any, obj2: any) => {if(this.player._body.blocked.down){this.jmp=true; } },undefined,this);
+    }
+    update(time: number, delta: number): void {
+        this.player.update(time,delta);
+        if(this.boss.life<=0){
+            this.boss.destroy();
+            if(!this.win){
+                this.createCloud();
+            }
+            this.win=true;
+        }
+        this.jump();
+        
 
         if(this.keyEsc.isDown&&this.HUD.alpha==0){
             this.createHUD();
