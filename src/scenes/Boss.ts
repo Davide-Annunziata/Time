@@ -74,7 +74,7 @@ export default class Boss extends Phaser.Scene {
             this.map.heightInPixels //height
             );
         this.mainCam.startFollow(this.player);
-        this.cloud=this.physics.add.image(90,655,"logo-game").setOrigin(0.5,0.5).setDepth(12).setScale(0.4).setAlpha(0).setImmovable(true);
+        this.cloud=this.physics.add.image(90,655,"nuvola").setOrigin(0.5,0.5).setDepth(12).setAlpha(0).setImmovable(true).setScale(1.25);
         this.cuori=this.add.image(this.cameras.main.worldView.x+75,this.cameras.main.worldView.y+35,"3cuori");
 
         this.physics.world.setBounds(
@@ -117,20 +117,41 @@ export default class Boss extends Phaser.Scene {
 
         this.physics.add.collider(this.groupProj,this.layer2,(proj: any, _tile: any) => {
             proj.destroy();
-                if (_tile.properties.worldBounds == true) {				
-                    proj.destroy();
-                }
+            },undefined,this
+        )
+
+        this.physics.add.overlap(this.groupProj,this.layer2,(proj: any, _tile: any) => {
+            if (_tile.properties.worldBounds == true) {				
+                proj.destroy();
+            }
+            },undefined,this
+        )
+
+        this.physics.add.collider(this.groupThunder,this.layer2,(proj: any, _tile: any) => {
+            proj.destroy();
             },undefined,this
         );
+
+        this.physics.add.collider(this.groupFire,this.layer2,(proj: any, _tile: any) => {
+            proj.destroy();
+            },undefined,this
+        );
+
+        this.physics.add.overlap(this.groupFire,this.layer2,(proj: any, _tile: any) => {
+            if (_tile.properties.worldBounds == true) {				
+                proj.destroy();
+            }
+            },undefined,this
+        )
 
         this.createCollider();
         this.time.addEvent({
             delay: 3000, loop: true, callback: () => {
-                if(this.boss.life>0&&!this.player.pause&&!this.triggered){
+                if(this.boss.life>0&&!this.player.pause&&!this.triggered&&this.boss.scene!=undefined){
                     this.thunder();
                     this.thunder();
                     this.fireBall();
-                    if(this.boss.life<=55){
+                    if(this.boss.life<=55&&this.boss.scene!=undefined){
                         this.thunder();
                         this.time.addEvent({
                             delay: 1000, loop: false, callback: () => {
@@ -307,29 +328,11 @@ export default class Boss extends Phaser.Scene {
     
     createHUD(){
         this.HUD=this.add.container().setAlpha(1);
-        this.base=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+15,"base").setOrigin(0.5,0.5).setDepth(8);
-        this.textMenu=this.add.bitmapText(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-90, "arcade", "Menu", 30)
-        .setAlpha(1)
-        .setDepth(10)
-        .setOrigin(0.5,0.5)
-        .setTint(0x0000);
-        this.textContinua=this.add.bitmapText(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-10, "arcade", "Continua", 28)
-        .setAlpha(1)
-        .setDepth(10)
-        .setOrigin(0.5,0.5)
-        .setTint(0x0000)
-        .setInteractive()
-        .on("pointerdown",()=>{this.HUD.setAlpha(0);this.player.pause=false;console.log(1);});
-        this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-10,"rettangolo").setInteractive().on("pointerdown",()=>{this.HUD.setAlpha(0);console.log(1);this.player.pause=false;}).setOrigin(0.5,0.5).setDepth(9);
-        this.textEsci=this.add.bitmapText(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+90, "arcade", "Esci", 28)
-        .setDepth(10)
-        .setOrigin(0.5,0.5)
-        .setTint(0x0000)
-        .setInteractive()
-        .on("pointerdown",()=>{this.scene.remove,this.scene.start("LevelSelection");this.music.destroy()});
-        
-        this.HUD.add([this.base,this.continua,this.textMenu,this.textContinua,this.textEsci]);
-        this.HUD.setAlpha(0).setDepth(12);
+        this.base=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+15,"base").setOrigin(0.5,0.5).setDepth(12);
+        this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-15,"continua").setInteractive().on("pointerdown",()=>{this.HUD.setAlpha(0);console.log(1);this.player.pause=false;}).setOrigin(0.5,0.5).setDepth(9).setScale(0.3);
+        this.esci=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+85,"esci").setInteractive().on("pointerdown",()=>{this.music.destroy();this.scene.remove;this.scene.start("LevelSelection")}).setOrigin(0.5,0.5).setDepth(9).setScale(0.3);    
+        this.HUD.add([this.base,this.continua,this.esci]);
+        this.HUD.setAlpha(0).setDepth(100);
     }
 
     createProj(){
@@ -362,7 +365,7 @@ export default class Boss extends Phaser.Scene {
     }
 
     fireBall(){
-        if(this.scene!=undefined){
+        if(this.boss.scene!=undefined){
             let fireBall = this.physics.add.image(this.boss.body.position.x+50,this.boss.body.position.y+20,"logo-game").setDepth(10);
             fireBall.setOrigin(0).setDepth(9).setScale(0.1);
             fireBall.body.allowGravity=false;

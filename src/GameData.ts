@@ -42,15 +42,14 @@ export let GameData: any = {
     {name:"logo-game", path:"assets/images/GameTitle.png"},
     {name: "bg1", path: "assets/map/sfondo1.jpg" },
     {name: "bg2", path: "assets/map/sfondo2.jpg" },
-    { name: "skel", path: "assets/images/bg/skel.png" },
     { name: "thunder", path: "assets/images/thunder.png" },
-    { name: "rettangolo", path: "assets/images/rettangolo.png" },
     { name: "base", path: "assets/images/base.png" },
     { name: "continua", path: "assets/images/continua.png" },
     { name: "esci", path: "assets/images/esci.png" },
     { name: "1cuore", path: "assets/images/1cuore.png" },
     { name: "2cuori", path: "assets/images/2cuori.png" },
-    { name: "3cuori", path: "assets/images/3cuori.png" }
+    { name: "3cuori", path: "assets/images/3cuori.png" },
+    { name: "nuvola", path: "assets/images/nuvola.png" }
   ],
   atlas: [],
   sounds: [{

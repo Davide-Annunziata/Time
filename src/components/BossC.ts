@@ -16,18 +16,13 @@ export default class BossC extends Phaser.GameObjects.Sprite implements IBoss {
 	//array di oggetti per la creazione dell’animazione
 	private _animations: Array<{ key: string, frames: Array<number>, frameRate: number, yoyo: boolean, repeat: number }> = [
 	{ key: "move", frames: [], frameRate: 10, yoyo: false, repeat: -1 },
-	{ key: "idle", frames: [], frameRate: 10, yoyo: false, repeat: -1 }
 	];
     public life:integer;
 
     constructor(params: genericConfig) {
             super(params.scene, params.x, params.y+20, params.key);
                 this._config = params;
-                //richiamiamo il metodo create nel quale sono inserite alcune
-                // inizializzazioni della nostra classe custom
                 this.create();
-                //richiamiamo un metodo locale per implementare le animazioni dello
-                // sprite
                 this.createAnimations();
             }
 
