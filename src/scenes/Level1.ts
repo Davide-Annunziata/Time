@@ -31,7 +31,11 @@ export default class Level1 extends Phaser.Scene{
     private groupBonus: Phaser.GameObjects.Group;
     private points:integer;
     private textPoints:Phaser.GameObjects.BitmapText;
-
+    private posX:integer;
+    private posY:integer;
+    private lives:integer;
+    private cuori:Phaser.GameObjects.Image;
+    private saved:boolean;
     constructor() {
         super({
         key: "Level1",
@@ -43,6 +47,9 @@ export default class Level1 extends Phaser.Scene{
             this.completed=false;
         }
         this.player= new Player({ scene: this, x: 100, y: 500, key: "player" });
+        this.posX=this.player._body.position.x+10;
+        this.posY=this.player._body.position.y;
+        this.lives=3;
         this.physics.add.existing(this.player);
         this.music=this.sound.add("music1",{loop:true,volume:.3});
         this.music.play();
@@ -55,7 +62,7 @@ export default class Level1 extends Phaser.Scene{
         .setDepth(100)
         .setOrigin(0.5,0.5)
         .setTint(0x0000);
-
+        this.cuori=this.add.image(this.cameras.main.worldView.x+75,this.cameras.main.worldView.y+35,"3cuori");
         this.mainCam = this.cameras.main;
         this.mainCam.setBounds(
             0, //x
@@ -87,27 +94,9 @@ export default class Level1 extends Phaser.Scene{
 
         this.layer2.setCollisionByProperty({collide: true });
         
-        this.physics.add.collider(this.player,this.layer2,(_player: any, _tile: any) => {
-            if(this.player._body.blocked.down){
-                this.jmp=true;
-            }
-                if (_tile.properties.exit == true) {				
-                    console.log("level completed");
-                    this.completed=true;
-                    this.scene.start("LevelSelection");
-                }
-            },undefined,this
-        );
         this.groupBonus = this.add.group({ runChildUpdate: true });
 
         this.groupBonus.add(new Bcoin({ scene: this,  x: 200, y: 550, key: "bonus-coin" }));
-
-        this.physics.add.collider(this.player, this.groupBonus,(player: any, bonus: any)=>{
-            //let music=this.sound.add("music1",{loop:false,volume:.3});
-            //music.play();
-            bonus.destroy();
-            this.points+=1
-        }, undefined, this);
         this.setupObjects();
     }
 
@@ -119,6 +108,57 @@ export default class Level1 extends Phaser.Scene{
     update(time: number, delta: number): void {
         this.player.update(time,delta);
         this.jump();
+        this.physics.add.collider(this.player,this.layer2,(_player: any, _tile: any) => {
+            if(this.player._body.blocked.down){
+                this.jmp=true;
+            }
+            if (_tile.properties.exit == true) {	
+                //TODO			
+                console.log("level completed");
+                this.completed=true;
+                this.scene.start("LevelSelection");
+            }else if(_tile.properties.check==true&&!this.saved){
+                this.saved=true;
+                this.posX=this.player._body.position.x;
+                this.posY=this.player._body.position.y;
+                this.time.addEvent({
+                    delay: 5000, loop: false, callback: () => {
+                        this.saved=false;
+                    }, callbackScope: this
+                });
+               
+                console.log("saved");;
+            }else if(_tile.properties.kill==true){
+                if(this.lives>1){
+                    console.log("morto");
+                    this.lives--;
+                    this.mainCam.stopFollow();
+                    this.player.destroy();
+                    this.player.pause=true;
+                    
+                    this.time.addEvent({
+                        delay: 1000, loop: false, callback: () => {
+                            this.player= new Player({ scene: this, x:this.posX, y: this.posY, key: "player" });
+                            this.player.setAlpha(1);
+                            this.mainCam.startFollow(this.player);
+                        }, callbackScope: this
+                    });
+                }else{
+                    this.time.addEvent({
+                        delay: 100, loop: false, callback: () => {
+                            this.scene.restart();
+                        }, callbackScope: this
+                    });
+                }
+            }
+        },undefined,this
+        );
+        this.physics.add.collider(this.player, this.groupBonus,(player: any, bonus: any)=>{
+            //let music=this.sound.add("music1",{loop:false,volume:.3});
+            //music.play();
+            bonus.destroy();
+            this.points+=1
+        }, undefined, this);
         if(this.keyEsc.isDown&&this.HUD.alpha==0){
             this.createHUD();
             this.player.pause=true;
@@ -134,7 +174,6 @@ export default class Level1 extends Phaser.Scene{
             this.player._body.allowGravity=true;
         }
         this.changePoint();
-        
     }
 
     jump():void{
@@ -182,11 +221,19 @@ export default class Level1 extends Phaser.Scene{
 
     changePoint(){
         this.textPoints.destroy();
-        this.textPoints=this.add.bitmapText(this.cameras.main.worldView.x+130,this.cameras.main.worldView.y+50, "arcade", "Punti: "+this.points, 18)
+        this.textPoints=this.add.bitmapText(this.cameras.main.worldView.x+90,this.cameras.main.worldView.y+75, "arcade", "Punti: "+this.points, 18)
         .setAlpha(1)
         .setDepth(100)
         .setOrigin(0.5,0.5)
         .setTint(0x0000);
+        this.cuori.destroy();
+        if(this.lives==3){
+            this.cuori=this.add.image(this.cameras.main.worldView.x+75,this.cameras.main.worldView.y+35,"3cuori");
+        }else if(this.lives==2){
+            this.cuori=this.add.image(this.cameras.main.worldView.x+55,this.cameras.main.worldView.y+35,"2cuori");
+        }else if(this.lives==1){
+            this.cuori=this.add.image(this.cameras.main.worldView.x+35,this.cameras.main.worldView.y+35,"1cuore");
+        }
     }
 
     addBonus(bonus: Bonus) {
@@ -201,18 +248,13 @@ export default class Level1 extends Phaser.Scene{
 		//recuperiamo il layer object dalla mappa di TILED
 		let _objLayer: Phaser.Tilemaps.ObjectLayer = this.map.getObjectLayer("gameObjects");
 		// controlliamo che _objLayer non sia null
-		 if (_objLayer != null) {
+		if (_objLayer != null) {
 			// recuperiamo gli objects all'interno del layer
 			let _objects: any = _objLayer.objects as any[];
-            console.log(_objects);
-			// cicliamo l'array
 			_objects.forEach((tile: Phaser.Tilemaps.Tile) => {
-			    //convertiamo la property in un oggetto al quale possiamo accedere
                 this.addBonus(new Bcoin({ scene: this,  x: tile.x, y: tile.y, key: "bonus-coin" })); 
 			});
-		}else{
-            console.log(2);
-        }
+		}
 	}
 
     
