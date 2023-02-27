@@ -34,6 +34,12 @@ export let GameData: any = {
       width: 64,
       height: 64,
       frames: 8
+    },{	
+      name: "boss-model",
+      path: "assets/images/boss.png",
+      width: 36,
+      height: 22,
+      frames: 3
     }
     
   ]

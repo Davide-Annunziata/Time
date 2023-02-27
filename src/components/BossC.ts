@@ -15,7 +15,7 @@ export default class BossC extends Phaser.GameObjects.Sprite implements IBoss {
 
 	//array di oggetti per la creazione dell’animazione
 	private _animations: Array<{ key: string, frames: Array<number>, frameRate: number, yoyo: boolean, repeat: number }> = [
-	{ key: "move", frames: [], frameRate: 10, yoyo: false, repeat: -1 },
+	{ key: "move", frames: [0,1,2,1], frameRate: 2, yoyo: false, repeat: -1 }
 	];
     public life:integer;
 
@@ -35,9 +35,9 @@ export default class BossC extends Phaser.GameObjects.Sprite implements IBoss {
 		this._body = <Phaser.Physics.Arcade.Body>this.body;
         this._body.setImmovable();
 	
-		this._body.setSize(46,68);
+		
 		this._cursors = this._scene.input.keyboard.createCursorKeys();
-		this.setDepth(4);
+		this.setDepth(4).setScale(3.5);
 
 		this._scene.add.existing(this);
 	}
@@ -49,7 +49,7 @@ export default class BossC extends Phaser.GameObjects.Sprite implements IBoss {
 			if (!this._scene.anims.exists(element.key)) {
 				let _animation:Phaser.Types.Animations.Animation={
                     key: element.key,
-                    frames: this.anims.generateFrameNumbers("player", { frames: element.frames }),
+                    frames: this.anims.generateFrameNumbers("boss-model", { frames: element.frames }),
                     frameRate:element.frameRate,
                     yoyo:element.yoyo,
                     repeat:element.repeat
@@ -57,6 +57,7 @@ export default class BossC extends Phaser.GameObjects.Sprite implements IBoss {
                 this.anims.create(_animation);
 			}
 		});
+		this.anims.play("move");
 
 	}
     update(time: number, delta: number) {
