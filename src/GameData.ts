@@ -46,9 +46,13 @@ export let GameData: any = {
 ,
   images: [
     {name:"logo-game", path:"assets/images/GameTitle.png"},
+    {name: "bg0", path: "assets/map/sfondo0.jpg" },
     {name: "bg1", path: "assets/map/sfondo1.jpg" },
     {name: "bg2", path: "assets/map/sfondo2.jpg" },
+    {name: "bg3", path: "assets/map/sfondo3.jpg" },
+    {name: "bg4", path: "assets/map/sfondo4.jpg" },
     { name: "thunder", path: "assets/images/thunder.png" },
+    { name: "fireball", path: "assets/images/fireball.png" },
     { name: "base", path: "assets/images/base.png" },
     { name: "continua", path: "assets/images/continua.png" },
     { name: "esci", path: "assets/images/esci.png" },
@@ -59,6 +63,9 @@ export let GameData: any = {
   ],
   atlas: [],
   sounds: [{
+    name: "music",
+    paths: ["assets/sounds/music0.ogg", "assets/sounds/music0.m4a"],
+    },{
       name: "music1",
       paths: ["assets/sounds/music1.ogg", "assets/sounds/music1.m4a"],
     },{
@@ -71,6 +78,9 @@ export let GameData: any = {
     {
       name: "music4",
       paths: ["assets/sounds/music4.ogg", "assets/sounds/music4.m4a"],
+    },{
+      name: "tick",
+      paths: ["assets/sounds/tick.ogg", "assets/sounds/tick.m4a"],
     },
   ],
   audio: [],
@@ -86,6 +96,9 @@ export let GameData: any = {
     },{
       key: "level-3",
       path: "assets/map/level-3.json",
-      },
+    },{
+      key: "level-4",
+      path: "assets/map/level-4.json",
+    }
 	],
 };

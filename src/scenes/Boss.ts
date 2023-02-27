@@ -11,9 +11,6 @@ export default class Boss extends Phaser.Scene {
     private continua :Phaser.GameObjects.Image;
     private esci: Phaser.GameObjects.Image;
     private base: Phaser.GameObjects.Image;
-    private textMenu: Phaser.GameObjects.BitmapText;
-    private textContinua: Phaser.GameObjects.BitmapText;
-    private textEsci: Phaser.GameObjects.BitmapText;
     public completed:boolean=false;
   //i due riferimenti alla mappa di tile e al tileset
 	private map: Phaser.Tilemaps.Tilemap;
@@ -97,7 +94,7 @@ export default class Boss extends Phaser.Scene {
         this.layer2 = this.map
         .createLayer("collision", this.tileset, 0, 0)
         .setDepth(0)
-        .setAlpha(1);
+        .setAlpha(0);
 
         this.layer2.setCollisionByProperty({collide: true });
 
@@ -108,13 +105,6 @@ export default class Boss extends Phaser.Scene {
             },undefined,this
         );
         
-        this.physics.add.collider(this.groupProj,this.boss,(proj: any, boss: any) => {	
-            proj.destroy();
-            boss.life-=50;
-            console.log(this.boss.life);
-            },undefined,this
-        );
-
         this.physics.add.collider(this.groupProj,this.layer2,(proj: any, _tile: any) => {
             proj.destroy();
             },undefined,this

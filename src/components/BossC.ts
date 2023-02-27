@@ -1,11 +1,11 @@
 import IBoss from "./IBoss";
 //Importiamo la scena di gameplay in modo da potervi accedere
-import GamePlay from "../scenes/GamePlay";
+import Level1 from "../scenes/Level1";
 
 export default class BossC extends Phaser.GameObjects.Sprite implements IBoss {
 	private _config: genericConfig;
 	//riferimento alla scena dove il nostro game object verrà inserito
-	private _scene: GamePlay;
+	private _scene: Level1;
 	//variabile locale di tipo arcade.body per poter accedere ai metodi del Body
 	// descritti nel capitolo 7
 	private _body: Phaser.Physics.Arcade.Body;
@@ -28,7 +28,7 @@ export default class BossC extends Phaser.GameObjects.Sprite implements IBoss {
 
 	create() {
         this.life=100;
-		this._scene = <GamePlay>this._config.scene;
+		this._scene = <Level1>this._config.scene;
 
 		this._scene.physics.world.enable(this);
 		

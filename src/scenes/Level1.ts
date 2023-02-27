@@ -1,12 +1,8 @@
-
-import GamePlay from "./GamePlay";
 import Player from "../components/Player";
 import Bonus from "../components/Bonus";
 import Bcoin from "../components/Bcoin";
 
 export default class Level1 extends Phaser.Scene{
-   
-
     private mainCam:Phaser.Cameras.Scene2D.Camera;
     private player:Player;
     private music: Phaser.Sound.BaseSound;
@@ -15,9 +11,6 @@ export default class Level1 extends Phaser.Scene{
     private continua :Phaser.GameObjects.Image;
     private esci: Phaser.GameObjects.Image;
     private base: Phaser.GameObjects.Image;
-    private textMenu: Phaser.GameObjects.BitmapText;
-    private textContinua: Phaser.GameObjects.BitmapText;
-    private textEsci: Phaser.GameObjects.BitmapText;
     public completed:boolean;
     private bg:Phaser.GameObjects.Image;
   //i due riferimenti alla mappa di tile e al tileset
@@ -154,12 +147,13 @@ export default class Level1 extends Phaser.Scene{
         },undefined,this
         );
         this.physics.add.collider(this.player, this.groupBonus,(player: any, bonus: any)=>{
-            //let music=this.sound.add("music1",{loop:false,volume:.3});
-            //music.play();
+            let music=this.sound.add("tick",{loop:false,volume:1});
+            music.play();
             bonus.destroy();
             this.points+=1
         }, undefined, this);
     }
+    
     update(time: number, delta: number): void {
         this.player.update(time,delta);
         this.jump();

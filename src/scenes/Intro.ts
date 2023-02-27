@@ -49,8 +49,5 @@ export default class Intro extends Phaser.Scene {
 
   }
 
-  private onClick():void{
-
-  }
 }
 

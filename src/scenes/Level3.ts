@@ -1,4 +1,3 @@
-import GamePlay from "./GamePlay";
 import Player from "../components/Player";
 import Bonus from "../components/Bonus";
 import Bcoin from "../components/Bcoin";
@@ -12,9 +11,6 @@ export default class Level3 extends Phaser.Scene {
     private continua :Phaser.GameObjects.Image;
     private esci: Phaser.GameObjects.Image;
     private base: Phaser.GameObjects.Image;
-    private textMenu: Phaser.GameObjects.BitmapText;
-    private textContinua: Phaser.GameObjects.BitmapText;
-    private textEsci: Phaser.GameObjects.BitmapText;
     public completed:boolean=false;
   //i due riferimenti alla mappa di tile e al tileset
 	private map: Phaser.Tilemaps.Tilemap;
@@ -83,16 +79,12 @@ export default class Level3 extends Phaser.Scene {
         this.layer2 = this.map
         .createLayer("collision", this.tileset, 0, 0)
         .setDepth(0)
-        .setAlpha(1);
+        .setAlpha(0);
 
         this.layer2.setCollisionByProperty({collide: true });
         
         this.groupBonus = this.add.group({ runChildUpdate: true });
 
-        this.physics.add.collider(this.player, this.groupBonus,(player: any, bonus: any)=>{
-            bonus.destroy();
-            this.points+=1
-        }, undefined, this);
         this.setupObjects();
 
         this.createCollider();
@@ -149,17 +141,18 @@ export default class Level3 extends Phaser.Scene {
                 }
             }
         },undefined,this
-    );
-    this.physics.add.collider(this.player, this.groupBonus,(player: any, bonus: any)=>{
-        //let music=this.sound.add("music1",{loop:false,volume:.3});
-        //music.play();
-        bonus.destroy();
-        this.points+=1
-    }, undefined, this);
+        );
+        this.physics.add.collider(this.player, this.groupBonus,(player: any, bonus: any)=>{
+            let music=this.sound.add("tick",{loop:false,volume:1});
+            music.play();
+            bonus.destroy();
+            this.points+=1
+        }, undefined, this);
     }
     update(time: number, delta: number): void {
         this.player.update(time,delta);
         this.jump();
+
         if(this.keyEsc.isDown&&this.HUD.alpha==0){
             this.createHUD();
             this.player.pause=true;

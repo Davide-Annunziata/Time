@@ -1,5 +1,3 @@
-
-import GamePlay from "../scenes/GamePlay";
 import Bonus from "./Bonus";
 
 export default class Bcoin extends Bonus {
@@ -9,9 +7,6 @@ export default class Bcoin extends Bonus {
 
     constructor(params: genericConfig) {
         super(params);
-        // settiamo il nome di questo gameObject a coin
-        // potrebbe esserci utile per differenziare i tipi di bonus 
-        // quando vengono raccolti dal player
         this.setName("coin");
         this.create();
       }
