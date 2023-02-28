@@ -46,7 +46,7 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
 	
 		this._body.setCollideWorldBounds(true).setSize(46,62);
 		this._cursors = this._scene.input.keyboard.createCursorKeys();
-		this.setDepth(4);
+		this.setDepth(3);
 		this.pause=false;
 		this._scene.add.existing(this);
 	}

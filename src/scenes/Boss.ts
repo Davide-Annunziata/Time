@@ -157,6 +157,14 @@ export default class Boss extends Phaser.Scene {
                 } 
             }, callbackScope: this
         });     
+
+        this.time.addEvent({
+            delay: 500, loop: true, callback: () => {
+                if(this.player.scene!=undefined&&this.boss.scene!=undefined){
+                    this.boss.changeDir(this.player.body.position.x<this.boss.body.position.x);
+                }
+            }, callbackScope: this
+        }); 
     }
 
     create() {
@@ -171,8 +179,9 @@ export default class Boss extends Phaser.Scene {
             }
             if (_tile.properties.exit == true) {	
                 //TODO			
+                this.music.destroy();
                 console.log("level completed");
-                this.completed=true;
+                this.scene.remove();
                 this.scene.start("LevelSelection");
             }else if(_tile.properties.check==true&&!this.saved){
                 this.saved=true;
@@ -244,8 +253,10 @@ export default class Boss extends Phaser.Scene {
         
         this.physics.add.collider(this.player,this.cloud,(obj1: any, obj2: any) => {if(this.player._body.blocked.down){this.player.jmp=true; } },undefined,this);
     }
+
     update(time: number, delta: number): void {
-        this.player.update(time,delta);
+        this.player.update(time,delta);     
+  
         if(this.boss.life<=0){
             this.boss.destroy();
             if(!this.win){

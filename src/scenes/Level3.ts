@@ -31,6 +31,7 @@ export default class Level3 extends Phaser.Scene {
     private cuori:Phaser.GameObjects.Image;
     private saved:boolean;
     public enemyGroup: Phaser.GameObjects.Group;
+
     constructor() {
         super({
         key: "Level3",
@@ -52,9 +53,9 @@ export default class Level3 extends Phaser.Scene {
         this.map = this.make.tilemap({ key: "level-3"});
         this.keyEsc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
         this.points=0;
-        this.textPoints=this.add.bitmapText(this.cameras.main.worldView.x+125,this.cameras.main.worldView.y+75, "arcade", "Frammenti: "+this.points, 18)
+        this.textPoints=this.add.bitmapText(this.cameras.main.worldView.x+125,this.cameras.main.worldView.y+75, "arcade", "Frammenti: "+this.points, 18).setDepth(15)
         .setAlpha(1)
-        .setDepth(100)
+        .setDepth(15)
         .setOrigin(0.5,0.5)
         .setTint(0x0000);
         this.cuori=this.add.image(this.cameras.main.worldView.x+75,this.cameras.main.worldView.y+35,"3cuori");
@@ -118,10 +119,12 @@ export default class Level3 extends Phaser.Scene {
             if(this.player._body.blocked.down){
                 this.player.jmp=true;
             }
-            if (_tile.properties.exit == true) {	
+            if (_tile.properties.exit == true&&this.points>=15) {	
                 //TODO			
+                this.music.destroy();
                 console.log("level completed");
                 Level3.completed=true;
+                this.scene.remove();
                 this.scene.start("LevelSelection");
             }else if(_tile.properties.check==true&&!this.saved){
                 this.saved=true;
@@ -223,23 +226,23 @@ export default class Level3 extends Phaser.Scene {
         this.esci=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+85,"esci").setInteractive().on("pointerdown",()=>{this.music.destroy();this.scene.remove;this.scene.start("LevelSelection")}).setOrigin(0.5,0.5).setDepth(9).setScale(0.3);
         
         this.HUD.add([this.base,this.continua,this.esci]);
-        this.HUD.setAlpha(0).setDepth(100);
+        this.HUD.setAlpha(0).setDepth(15);
     }
 
     changePoint(){
         this.textPoints.destroy();
         this.textPoints=this.add.bitmapText(this.cameras.main.worldView.x+125,this.cameras.main.worldView.y+75, "arcade", "Frammenti: "+this.points, 18)
         .setAlpha(1)
-        .setDepth(100)
+        .setDepth(15)
         .setOrigin(0.5,0.5)
         .setTint(0x0000);
         this.cuori.destroy();
         if(this.lives==3){
-            this.cuori=this.add.image(this.cameras.main.worldView.x+75,this.cameras.main.worldView.y+35,"3cuori");
+            this.cuori=this.add.image(this.cameras.main.worldView.x+75,this.cameras.main.worldView.y+35,"3cuori").setDepth(15);
         }else if(this.lives==2){
-            this.cuori=this.add.image(this.cameras.main.worldView.x+55,this.cameras.main.worldView.y+35,"2cuori");
+            this.cuori=this.add.image(this.cameras.main.worldView.x+55,this.cameras.main.worldView.y+35,"2cuori").setDepth(15);
         }else if(this.lives==1){
-            this.cuori=this.add.image(this.cameras.main.worldView.x+35,this.cameras.main.worldView.y+35,"1cuore");
+            this.cuori=this.add.image(this.cameras.main.worldView.x+35,this.cameras.main.worldView.y+35,"1cuore").setDepth(15);
         }
     }
 

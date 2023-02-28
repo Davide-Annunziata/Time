@@ -20,7 +20,7 @@ export default class Intro extends Phaser.Scene {
     .setOrigin(0.5,0.5)
     .setInteractive()
     .on("pointerdown",()=>{
-      console.log("pressed");
+      console.log("play");
       this.scene.start("LevelSelection");
     });
 
@@ -29,8 +29,8 @@ export default class Intro extends Phaser.Scene {
     .setOrigin(0.5,0.5)
     .setInteractive()
     .on("pointerdown",()=>{
-      console.log("pressed2");
-      this.playText.setInteractive(false);
+      console.log("credits");
+      this.createCredits()
     });
 
     this.howToPlayText=this.add.text(this.game.canvas.width/2,360,"Come giocare",{fontSize:"40px"})
@@ -38,12 +38,27 @@ export default class Intro extends Phaser.Scene {
     .setOrigin(0.5,0.5)
     .setInteractive()
     .on("pointerdown",()=>{
-      console.log("pressed2");
-      this.playText.setInteractive(false);
+      console.log("come giocare");
+      this.createHow();
     });
     
   }
 
+  createCredits(){
+    this.creditsText.setInteractive(false);
+    let base:Phaser.GameObjects.Image=this.add.image(this.game.canvas.width/2,300,"base").setOrigin(0.5,0.5).setDepth(12).setInteractive().on("pointerdown",()=>{
+      base.destroy();
+      this.creditsText.setInteractive(true);
+    });       
+  }
+
+  createHow(){
+    this.howToPlayText.setInteractive(false);
+    let base:Phaser.GameObjects.Image=this.add.image(this.game.canvas.width/2,300,"base").setOrigin(0.5,0.5).setDepth(12).setInteractive().on("pointerdown",()=>{
+      base.destroy();
+      this.howToPlayText.setInteractive(true);
+    });       
+  }
 
   update(time: number, delta: number): void {
 

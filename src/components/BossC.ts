@@ -38,6 +38,7 @@ export default class BossC extends Phaser.GameObjects.Sprite implements IBoss {
 		
 		this._cursors = this._scene.input.keyboard.createCursorKeys();
 		this.setDepth(10).setScale(3.5);
+		this._body.setSize(25,25).setOffset(0,0);
 
 		this._scene.add.existing(this);
 	}
@@ -59,6 +60,15 @@ export default class BossC extends Phaser.GameObjects.Sprite implements IBoss {
 		});
 		this.anims.play("move");
 
+	}
+
+	changeDir(x:boolean){
+		this.setFlipX(x);
+		if(x){
+			this._body.setOffset(15,0);
+		}else{
+			this._body.setOffset(0,0);
+		}
 	}
     update(time: number, delta: number) {
     }

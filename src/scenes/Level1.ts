@@ -7,7 +7,6 @@ export default class Level1 extends Phaser.Scene{
     private mainCam:Phaser.Cameras.Scene2D.Camera;
     private player:Player;
     private music: Phaser.Sound.BaseSound;
-    private jmp:boolean;
     private HUD :Phaser.GameObjects.Container;
     private continua :Phaser.GameObjects.Image;
     private esci: Phaser.GameObjects.Image;
@@ -31,6 +30,7 @@ export default class Level1 extends Phaser.Scene{
     private cuori:Phaser.GameObjects.Image;
     private saved:boolean;
     public enemyGroup: Phaser.GameObjects.Group;
+
     constructor() {
         super({
         key: "Level1",
@@ -54,10 +54,10 @@ export default class Level1 extends Phaser.Scene{
         this.points=0;
         this.textPoints=this.add.bitmapText(this.cameras.main.worldView.x+125,this.cameras.main.worldView.y+75, "arcade", "Frammenti: "+this.points, 18)
         .setAlpha(1)
-        .setDepth(100)
+        .setDepth(15)
         .setOrigin(0.5,0.5)
         .setTint(0x0000);
-        this.cuori=this.add.image(this.cameras.main.worldView.x+75,this.cameras.main.worldView.y+35,"3cuori");
+        this.cuori=this.add.image(this.cameras.main.worldView.x+75,this.cameras.main.worldView.y+35,"3cuori").setDepth(20);
         this.mainCam = this.cameras.main;
         this.mainCam.setBounds(
             0, //x
@@ -74,7 +74,6 @@ export default class Level1 extends Phaser.Scene{
             this.map.widthInPixels, //width
             this.map.heightInPixels //height
         );  
-        this.jmp=true;
 
         this.tileset = this.map.addTilesetImage("tilemap-extruded");
         this.layer = this.map
@@ -98,7 +97,6 @@ export default class Level1 extends Phaser.Scene{
         }, undefined, this);
 
         this.physics.add.overlap(this.enemyGroup,this.layer2,(enemy: any, _tile: any) => {
-            
             if (_tile.properties.worldBounds == true) {				
                 enemy.changeDirection();
             }
@@ -117,10 +115,12 @@ export default class Level1 extends Phaser.Scene{
             if(this.player._body.blocked.down){
                 this.player.jmp=true;
             }
-            if (_tile.properties.exit == true) {	
+            if (_tile.properties.exit == true&&this.points>=15) {	
                 //TODO			
+                this.music.destroy();
                 console.log("level completed");
                 Level1.completed=true;
+                this.scene.remove();
                 this.scene.start("LevelSelection");
             }else if(_tile.properties.check==true&&!this.saved){
                 this.saved=true;
@@ -208,23 +208,23 @@ export default class Level1 extends Phaser.Scene{
         this.esci=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+85,"esci").setInteractive().on("pointerdown",()=>{this.music.destroy();this.scene.remove;this.scene.start("LevelSelection")}).setOrigin(0.5,0.5).setDepth(9).setScale(0.3);
         
         this.HUD.add([this.base,this.continua,this.esci]);
-        this.HUD.setAlpha(0).setDepth(100);
+        this.HUD.setAlpha(0).setDepth(15);
     }
 
     changePoint(){
         this.textPoints.destroy();
         this.textPoints=this.add.bitmapText(this.cameras.main.worldView.x+125,this.cameras.main.worldView.y+75, "arcade", "Frammenti: "+this.points, 18)
         .setAlpha(1)
-        .setDepth(100)
+        .setDepth(15)
         .setOrigin(0.5,0.5)
         .setTint(0x0000);
         this.cuori.destroy();
         if(this.lives==3){
-            this.cuori=this.add.image(this.cameras.main.worldView.x+75,this.cameras.main.worldView.y+35,"3cuori");
+            this.cuori=this.add.image(this.cameras.main.worldView.x+75,this.cameras.main.worldView.y+35,"3cuori").setDepth(15);
         }else if(this.lives==2){
-            this.cuori=this.add.image(this.cameras.main.worldView.x+55,this.cameras.main.worldView.y+35,"2cuori");
+            this.cuori=this.add.image(this.cameras.main.worldView.x+55,this.cameras.main.worldView.y+35,"2cuori").setDepth(15);
         }else if(this.lives==1){
-            this.cuori=this.add.image(this.cameras.main.worldView.x+35,this.cameras.main.worldView.y+35,"1cuore");
+            this.cuori=this.add.image(this.cameras.main.worldView.x+35,this.cameras.main.worldView.y+35,"1cuore").setDepth(15);
         }
     }
 
