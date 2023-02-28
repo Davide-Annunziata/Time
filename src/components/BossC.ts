@@ -58,8 +58,6 @@ export default class BossC extends Phaser.GameObjects.Sprite implements IBoss {
                 this.anims.create(_animation);
 			}
 		});
-		this.anims.play("move");
-
 	}
 
 	changeDir(x:boolean){

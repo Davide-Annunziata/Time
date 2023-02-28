@@ -15,7 +15,7 @@ export default class Bonus extends Phaser.GameObjects.Sprite implements IBonus {
 		this._scene.add.existing(this);
 		this._body.setImmovable(true);
 		this._body.setCircle(27, 8, 9);
-		this.setDepth(100);
+		this.setDepth(6);
 	}
 	create() { }
 	update(time: number, delta: number) { }

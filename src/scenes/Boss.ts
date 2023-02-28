@@ -55,7 +55,7 @@ export default class Boss extends Phaser.Scene {
         this.bg=this.add.image(0, 0,"bg2").setOrigin(0,0).setDepth(0);
         this.groupProj= this.add.group();
         this.physics.add.existing(this.player);
-        this.music=this.sound.add("music4",{loop:true,volume:0.4});
+        this.music=this.sound.add("music3",{loop:true,volume:0.4});
         this.music.play();
         this.playing=false;
         this.map = this.make.tilemap({ key: "level-1"});
@@ -134,7 +134,7 @@ export default class Boss extends Phaser.Scene {
         this.createCollider();
         this.time.addEvent({
             delay: 3000, loop: true, callback: () => {
-                if(this.boss.life>0&&!this.player.pause&&!this.triggered&&this.boss.scene!=undefined){
+                if(this.boss.life>0&&!this.player.pause&&this.triggered&&this.boss.scene!=undefined){
                     this.thunder();
                     this.thunder();
                     this.fireBall();
@@ -163,6 +163,12 @@ export default class Boss extends Phaser.Scene {
                 if(this.player.scene!=undefined&&this.boss.scene!=undefined){
                     this.boss.changeDir(this.player.body.position.x<this.boss.body.position.x);
                 }
+                if(!this.triggered&&this.player.scene!=undefined&&this.player.body.position.x>100){
+                    this.boss.anims.play("move");
+                    this.triggered=true;
+                    this.music=this.sound.add("music4",{loop:true,volume:0.4});
+                    this.music.play();
+                }
             }, callbackScope: this
         }); 
     }
@@ -181,8 +187,13 @@ export default class Boss extends Phaser.Scene {
                 //TODO			
                 this.music.destroy();
                 console.log("level completed");
-                this.scene.remove();
-                this.scene.start("LevelSelection");
+                this.player.pause=true;
+                let base=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+15,"base").setOrigin(0.5,0.5).setDepth(12);
+                this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-15,"continua").setInteractive().on("pointerdown",()=>{this.scene.remove;this.scene.start("LevelSelection")})
+                .setOrigin(0.5,0.5)
+                .setDepth(9)
+                .setScale(0.3)
+                .setDepth(98);
             }else if(_tile.properties.check==true&&!this.saved){
                 this.saved=true;
                 this.posX=this.player._body.position.x;

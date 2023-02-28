@@ -2,9 +2,6 @@ import "phaser";
 import Boot from "./scenes/Boot";
 import Preloader from "./scenes/Preloader";
 import Intro from "./scenes/Intro";
-import Hud from "./scenes/Hud";
-import GameOver from "./scenes/GameOver";
-import GamePlay from "./scenes/GamePlay";
 import { GameData } from "./GameData";
 import LevelSelection from "./scenes/LeverSelection";
 import Level1  from "./scenes/Level1";
@@ -28,9 +25,6 @@ window.addEventListener("load", () => {
       Boot,
       Preloader,
       Intro,
-      Hud,
-      GamePlay,
-      GameOver,
       LevelSelection,
       Level1,
       Level2,

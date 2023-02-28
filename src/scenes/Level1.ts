@@ -90,6 +90,7 @@ export default class Level1 extends Phaser.Scene{
         
         this.groupBonus = this.add.group({ runChildUpdate: true });
         this.groupBonus = this.add.group({ runChildUpdate: true });
+        
         this.enemyGroup= this.add.group({ runChildUpdate: true });
         this.setupObjects();
         
@@ -116,12 +117,19 @@ export default class Level1 extends Phaser.Scene{
                 this.player.jmp=true;
             }
             if (_tile.properties.exit == true&&this.points>=15) {	
+                this.player.anims.play('idle', true);
                 //TODO			
                 this.music.destroy();
                 console.log("level completed");
                 Level1.completed=true;
-                this.scene.remove();
-                this.scene.start("LevelSelection");
+                this.player.pause=true;
+                let base=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+15,"base").setOrigin(0.5,0.5).setDepth(12);
+                this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-15,"continua").setInteractive().on("pointerdown",()=>{this.scene.remove;this.scene.start("LevelSelection")})
+                .setOrigin(0.5,0.5)
+                .setDepth(9)
+                .setScale(0.3)
+                .setDepth(98);
+
             }else if(_tile.properties.check==true&&!this.saved){
                 this.saved=true;
                 this.posX=this.player._body.position.x;

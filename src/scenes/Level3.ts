@@ -124,8 +124,13 @@ export default class Level3 extends Phaser.Scene {
                 this.music.destroy();
                 console.log("level completed");
                 Level3.completed=true;
-                this.scene.remove();
-                this.scene.start("LevelSelection");
+                this.player.pause=true;
+                let base=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+15,"base").setOrigin(0.5,0.5).setDepth(12);
+                this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-15,"continua").setInteractive().on("pointerdown",()=>{this.scene.remove;this.scene.start("LevelSelection")})
+                .setOrigin(0.5,0.5)
+                .setDepth(9)
+                .setScale(0.3)
+                .setDepth(98);
             }else if(_tile.properties.check==true&&!this.saved){
                 this.saved=true;
                 this.posX=this.player._body.position.x;
