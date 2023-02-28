@@ -1,4 +1,3 @@
-import GamePlay from "./GamePlay";
 import Player from "../components/Player";
 import BossC from "../components/BossC";
 
@@ -6,7 +5,6 @@ export default class Boss extends Phaser.Scene {
     private mainCam:Phaser.Cameras.Scene2D.Camera;
     private player:Player;
     private music: Phaser.Sound.BaseSound;
-    private jmp:boolean;
     private HUD :Phaser.GameObjects.Container;
     private continua :Phaser.GameObjects.Image;
     private esci: Phaser.GameObjects.Image;
@@ -80,7 +78,6 @@ export default class Boss extends Phaser.Scene {
             this.map.widthInPixels, //width
             this.map.heightInPixels //height
         );
-        this.jmp=true;
         this.groupThunder = this.add.group();
         this.groupFire=this.add.group();
         this.shot=false;
@@ -170,7 +167,7 @@ export default class Boss extends Phaser.Scene {
     createCollider(){
         this.physics.add.collider(this.player,this.layer2,(_player: any, _tile: any) => {
             if(this.player._body.blocked.down){
-                this.jmp=true;
+                this.player.jmp=true;
             }
             if (_tile.properties.exit == true) {	
                 //TODO			
@@ -189,28 +186,7 @@ export default class Boss extends Phaser.Scene {
                
                 console.log("saved");
             }else if(_tile.properties.kill==true){
-                if(this.lives>1){
-                    console.log("morto");
-                    this.lives--;
-                    this.mainCam.stopFollow();
-                    this.player.destroy();
-                    this.player.pause=true;
-                    
-                    this.time.addEvent({
-                        delay: 1000, loop: false, callback: () => {
-                            this.player= new Player({ scene: this, x:this.posX, y: this.posY, key: "player" });
-                            this.createCollider();
-                            this.player.setAlpha(1);
-                            this.mainCam.startFollow(this.player);
-                        }, callbackScope: this
-                    });
-                }else{
-                    this.time.addEvent({
-                        delay: 100, loop: false, callback: () => {
-                            this.scene.restart();
-                        }, callbackScope: this
-                    });
-                }
+                this.checkLives()
             }
         },undefined,this
         );
@@ -266,7 +242,7 @@ export default class Boss extends Phaser.Scene {
             }
         }, undefined, this);
         
-        this.physics.add.collider(this.player,this.cloud,(obj1: any, obj2: any) => {if(this.player._body.blocked.down){this.jmp=true; } },undefined,this);
+        this.physics.add.collider(this.player,this.cloud,(obj1: any, obj2: any) => {if(this.player._body.blocked.down){this.player.jmp=true; } },undefined,this);
     }
     update(time: number, delta: number): void {
         this.player.update(time,delta);
@@ -276,9 +252,7 @@ export default class Boss extends Phaser.Scene {
                 this.createCloud();
             }
             this.win=true;
-        }
-        this.jump();
-        
+        }      
 
         if(this.keyEsc.isDown&&this.HUD.alpha==0){
             this.createHUD();
@@ -298,22 +272,6 @@ export default class Boss extends Phaser.Scene {
             this.player._body.allowGravity=true;
         }
         this.changeLives();
-    }
-
-    jump():void{
-        if(this.player.scene!=undefined&&this.jmp&&!this.player.pause){
-            if (this.player._cursors.up.isDown) {
-                this.jmp=false;
-                this.tweens.add({
-                    targets: this.player,
-                duration: 500,
-                repeat: 0,
-                ease: "Linear",
-                y: this.player.body.position.y-75,
-                
-                });
-            }
-        }
     }
     
     createHUD(){
@@ -356,39 +314,46 @@ export default class Boss extends Phaser.Scene {
 
     fireBall(){
         if(this.boss.scene!=undefined){
-            let fireBall = this.physics.add.image(this.boss.body.position.x+50,this.boss.body.position.y+20,"logo-game").setDepth(10);
-            fireBall.setOrigin(0).setDepth(9).setScale(0.1);
+            let fireBall = this.physics.add.image(this.boss.body.position.x+50,this.boss.body.position.y+20,"fireball").setDepth(10);
+            fireBall.setOrigin(0).setDepth(9).setScale(2);
+            fireBall.body.setCircle(7, 4, 5)
             fireBall.body.allowGravity=false;
             fireBall.setVelocityX(250);
             this.groupFire.add(fireBall);
     
-            let fireBall2 = this.physics.add.image(this.boss.body.position.x-5,this.boss.body.position.y+20,"logo-game").setDepth(10);
-            fireBall2.setOrigin(1,0).setDepth(9).setScale(0.1);
+            let fireBall2 = this.physics.add.image(this.boss.body.position.x-5,this.boss.body.position.y+20,"fireball").setDepth(10);
+            fireBall2.setOrigin(1,0).setDepth(9).setScale(2);
+            fireBall2.body.setCircle(7, 4, 5)
             fireBall2.body.allowGravity=false;
             fireBall2.setVelocityX(-250);
             this.groupFire.add(fireBall2); 
         }
         
     }
+
     createCloud(){
         this.cloud.setAlpha(1);
         this.tweens.add({
-        targets: this.cloud,
-        duration: 4000,
-        repeat: -1,
-        ease: "Linear",
-        y: 300,
-        onComplete: () => {
-            this.tweens.add({
-                targets: this.cloud,
-                duration: 100,
-                repeat: 1,
-                ease: "Linear",
-                y: 650,   
-            });
-          }    
+            targets: this.cloud,
+            duration: 4000,
+            repeat: 0,
+            ease: "Linear",
+            y: 300,
+            onComplete: () => {
+                this.tweens.add({
+                    targets: this.cloud,
+                    duration: 4000,
+                    repeat: 0,
+                    ease: "Linear",
+                    y: 655,
+                    onComplete: () => {
+                        this.createCloud();     
+                    }
+                });
+            }    
         });
 
+        
     }
 
     changeLives(){
@@ -399,6 +364,31 @@ export default class Boss extends Phaser.Scene {
             this.cuori=this.add.image(this.cameras.main.worldView.x+55,this.cameras.main.worldView.y+35,"2cuori");
         }else if(this.lives==1){
             this.cuori=this.add.image(this.cameras.main.worldView.x+35,this.cameras.main.worldView.y+35,"1cuore");
+        }
+    }
+
+    checkLives(){
+        if(this.lives>1){
+            console.log("morto");
+            this.lives--;
+            this.mainCam.stopFollow();
+            this.player.destroy();
+            this.player.pause=true;
+            
+            this.time.addEvent({
+                delay: 1000, loop: false, callback: () => {
+                    this.player= new Player({ scene: this, x:this.posX, y: this.posY, key: "player" });
+                    this.createCollider();
+                    this.player.setAlpha(1);
+                    this.mainCam.startFollow(this.player);
+                }, callbackScope: this
+            });
+        }else{
+            this.time.addEvent({
+                delay: 100, loop: false, callback: () => {
+                    this.scene.restart();
+                }, callbackScope: this
+            });
         }
     }
 }

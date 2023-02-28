@@ -40,6 +40,12 @@ export let GameData: any = {
       width: 36,
       height: 22,
       frames: 3
+    },{	
+      name: "enemy",
+      path: "assets/images/enemy.png",
+      width: 12,
+      height: 15,
+      frames: 7
     }
     
   ]

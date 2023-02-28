@@ -14,6 +14,7 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
 	//variabile locale per impostare la velocità del body
 	private _velocity: number = 200
     public pause:boolean;
+    public jmp:boolean;
 	//array di oggetti per la creazione dell’animazione
 	private _animations: Array<{ key: string, frames: Array<number>, frameRate: number, yoyo: boolean, repeat: number }> = [
 	{ key: "move", frames: [0, 1, 2, 3, 4, 5,7], frameRate: 10, yoyo: false, repeat: -1 },
@@ -34,13 +35,14 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
             }
 
 	create() {
+        this.jmp=true;
         this.right=true;
 		this._scene = <Level1>this._config.scene;
 
 		this._scene.physics.world.enable(this);
 		
 		this._body = <Phaser.Physics.Arcade.Body>this.body;
-        this._body.setAllowGravity(true).setAccelerationY(130).setGravityY(200);
+        this._body.setAllowGravity(true).setAccelerationY(130).setGravityY(300);
 	
 		this._body.setCollideWorldBounds(true).setSize(46,62);
 		this._cursors = this._scene.input.keyboard.createCursorKeys();
@@ -69,7 +71,7 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
     update(time: number, delta: number) {
         if(this.scene!=undefined&&!this.pause){
             if (this._cursors.left.isDown) {
-                this._body.setAccelerationY(130).setGravityY(200);
+                this._body.setAccelerationY(130);
                 this.right=false;
                 this.setFlipX(true);
                 //effettua il play dell'animazione
@@ -79,7 +81,7 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
                 }
             //se il il cursore destro è premuto
             if (this._cursors.right.isDown) {
-                this._body.setAccelerationY(130).setGravityY(200);
+                this._body.setAccelerationY(130);
                 this.right=true;
                 this.setFlipX(false);
                 //effettua il play dell'animazione
@@ -90,16 +92,18 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
             
             //se il il cursore in alto è premuto
             if (this._cursors.up.isDown) {
-                this._body.setAccelerationY(130).setGravityY(200);
-                //effettua il play dell'animazione
+                if(this.jmp&&!this.pause){
+                    if (this._cursors.up.isDown) {
+                        this.jmp=false
+                        this._body.setVelocityY(-300)
+                    }
+                }
                 this.anims.play('move', true);
-                //setta la velocità x in modo da far muovere il player
             }
-            if (this._cursors.down.isDown) {
-            }
+            
 
             if (!this._cursors.left.isDown && !this._cursors.right.isDown && !this._cursors.up.isDown && !this._cursors.down.isDown) {                  
-                this._body.setVelocity(0,200).setGravityY(200);                
+                this._body.setVelocityX(0);                
                 this.anims.play('idle', true);
 
             }
