@@ -50,7 +50,7 @@ export default class Level3 extends Phaser.Scene {
         this.physics.add.existing(this.player);
         this.music=this.sound.add("music3",{loop:true,volume:0.1});
         this.music.play();
-        this.map = this.make.tilemap({ key: "level-3"});
+        this.map = this.make.tilemap({ key: "level-2"});
         this.keyEsc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
         this.points=0;
         this.textPoints=this.add.bitmapText(this.cameras.main.worldView.x+125,this.cameras.main.worldView.y+75, "arcade", "Frammenti: "+this.points, 18).setDepth(15)
@@ -62,7 +62,7 @@ export default class Level3 extends Phaser.Scene {
         this.mainCam = this.cameras.main;
         this.mainCam.setBounds(
             0, //x
-            -258, //y
+            0, //y
             this.map.widthInPixels, //width
             this.map.heightInPixels //height
             );
@@ -94,18 +94,20 @@ export default class Level3 extends Phaser.Scene {
         this.enemyGroup= this.add.group({ runChildUpdate: true });
         this.setupObjects();
         
-        this.physics.add.collider(this.layer2, this.enemyGroup,(_tile: any, enemy: any)=>{        
-        }, undefined, this);
-
-        this.physics.add.overlap(this.enemyGroup,this.layer2,(enemy: any, _tile: any) => {
-            
+        this.physics.add.collider(this.enemyGroup,this.layer2,(enemy: any, _tile: any) => {
             if (_tile.properties.worldBounds == true) {				
                 enemy.changeDirection();
             }
             },undefined,this
         )
 
-        
+        this.physics.add.overlap(this.enemyGroup,this.layer2,(enemy: any, _tile: any) => {
+            if (_tile.properties.worldBounds == true) {				
+                enemy.changeDirection();
+            }
+            },undefined,this
+        )
+
         this.createCollider();
     }
 
@@ -120,6 +122,7 @@ export default class Level3 extends Phaser.Scene {
                 this.player.jmp=true;
             }
             if (_tile.properties.exit == true&&this.points>=15) {	
+                this.player.anims.play('idle', true);
                 //TODO			
                 this.music.destroy();
                 console.log("level completed");
@@ -131,6 +134,7 @@ export default class Level3 extends Phaser.Scene {
                 .setDepth(9)
                 .setScale(0.3)
                 .setDepth(98);
+
             }else if(_tile.properties.check==true&&!this.saved){
                 this.saved=true;
                 this.posX=this.player._body.position.x;
@@ -163,8 +167,8 @@ export default class Level3 extends Phaser.Scene {
                 this.checkLives();
             }
         }, undefined, this);
-
     }
+
     update(time: number, delta: number): void {
         this.player.update(time,delta);
 
@@ -219,6 +223,7 @@ export default class Level3 extends Phaser.Scene {
         }else{
             this.time.addEvent({
                 delay: 100, loop: false, callback: () => {
+                    this.music.destroy();
                     this.scene.restart();
                 }, callbackScope: this
             });

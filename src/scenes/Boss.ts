@@ -83,6 +83,7 @@ export default class Boss extends Phaser.Scene {
         this.shot=false;
         this.win=false;
         this.tileset = this.map.addTilesetImage("tilemap-extruded");
+
         this.layer = this.map
 	    .createLayer("world", this.tileset, 0, 0)
 	    .setDepth(9)
@@ -132,17 +133,21 @@ export default class Boss extends Phaser.Scene {
         )
 
         this.createCollider();
+
         this.time.addEvent({
             delay: 3000, loop: true, callback: () => {
                 if(this.boss.life>0&&!this.player.pause&&this.triggered&&this.boss.scene!=undefined){
                     this.thunder();
                     this.thunder();
+                    let music=this.sound.add("fireball-sound",{loop:false,volume:1});
+                    music.play();
                     this.fireBall();
                     if(this.boss.life<=55&&this.boss.scene!=undefined){
                         this.thunder();
                         this.time.addEvent({
                             delay: 1000, loop: false, callback: () => {
                                 this.fireBall();
+                                music.play();
                             }, callbackScope: this
                         });
                     }
@@ -163,7 +168,7 @@ export default class Boss extends Phaser.Scene {
                 if(this.player.scene!=undefined&&this.boss.scene!=undefined){
                     this.boss.changeDir(this.player.body.position.x<this.boss.body.position.x);
                 }
-                if(!this.triggered&&this.player.scene!=undefined&&this.player.body.position.x>100){
+                if(!this.triggered&&this.player.scene!=undefined&&this.player.body.position.x>100&&this.boss.scene!=undefined){
                     this.boss.anims.play("move");
                     this.triggered=true;
                     this.music=this.sound.add("music4",{loop:true,volume:0.4});
@@ -394,7 +399,10 @@ export default class Boss extends Phaser.Scene {
             console.log("morto");
             this.lives--;
             this.mainCam.stopFollow();
-            this.player.destroy();
+            if(this.player.scene!=undefined){
+                this.player.destroy();
+            }
+            
             this.player.pause=true;
             
             this.time.addEvent({
@@ -408,6 +416,7 @@ export default class Boss extends Phaser.Scene {
         }else{
             this.time.addEvent({
                 delay: 100, loop: false, callback: () => {
+                    this.music.destroy();
                     this.scene.restart();
                 }, callbackScope: this
             });

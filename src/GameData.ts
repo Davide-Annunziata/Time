@@ -87,6 +87,9 @@ export let GameData: any = {
     },{
       name: "tick",
       paths: ["assets/sounds/tick.ogg", "assets/sounds/tick.m4a"],
+    },{
+      name: "fireball-sound",
+      paths: ["assets/sounds/fireball-sound.ogg", "assets/sounds/fireball-sound.m4a"],
     },
   ],
   audio: [],

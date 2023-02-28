@@ -15,7 +15,8 @@ export default class BossC extends Phaser.GameObjects.Sprite implements IBoss {
 
 	//array di oggetti per la creazione dell’animazione
 	private _animations: Array<{ key: string, frames: Array<number>, frameRate: number, yoyo: boolean, repeat: number }> = [
-	{ key: "move", frames: [0,1,2,1], frameRate: 2, yoyo: false, repeat: -1 }
+	{ key: "move", frames: [0,1,2,1], frameRate: 3, yoyo: false, repeat: -1 },
+	{ key: "idle", frames: [0], frameRate: 2, yoyo: false, repeat: -1 }
 	];
     public life:integer;
 
@@ -56,6 +57,7 @@ export default class BossC extends Phaser.GameObjects.Sprite implements IBoss {
                     repeat:element.repeat
                 }
                 this.anims.create(_animation);
+				this.anims.play("idle");
 			}
 		});
 	}

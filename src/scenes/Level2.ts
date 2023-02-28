@@ -84,7 +84,7 @@ export default class Level2 extends Phaser.Scene {
         this.layer2 = this.map
         .createLayer("collision", this.tileset, 0, 0)
         .setDepth(0)
-        .setAlpha(1);
+        .setAlpha(0);
 
         this.layer2.setCollisionByProperty({collide: true });
         
@@ -93,10 +93,14 @@ export default class Level2 extends Phaser.Scene {
         this.enemyGroup= this.add.group({ runChildUpdate: true });
         this.setupObjects();
         
-        this.physics.add.collider(this.layer2, this.enemyGroup,(_tile: any, enemy: any)=>{        
-        }, undefined, this);
+        this.physics.add.collider(this.enemyGroup,this.layer2,(enemy: any, _tile: any) => {
+            if (_tile.properties.worldBounds == true) {				
+                enemy.changeDirection();
+            }
+            },undefined,this
+        )
 
-        this.physics.add.overlap(this.enemyGroup,this.layer2,(enemy: any, _tile: any) => {  
+        this.physics.add.overlap(this.enemyGroup,this.layer2,(enemy: any, _tile: any) => {
             if (_tile.properties.worldBounds == true) {				
                 enemy.changeDirection();
             }
@@ -116,6 +120,7 @@ export default class Level2 extends Phaser.Scene {
                 this.player.jmp=true;
             }
             if (_tile.properties.exit == true&&this.points>=15) {	
+                this.player.anims.play('idle', true);
                 //TODO			
                 this.music.destroy();
                 console.log("level completed");
@@ -127,6 +132,7 @@ export default class Level2 extends Phaser.Scene {
                 .setDepth(9)
                 .setScale(0.3)
                 .setDepth(98);
+
             }else if(_tile.properties.check==true&&!this.saved){
                 this.saved=true;
                 this.posX=this.player._body.position.x;
@@ -185,7 +191,10 @@ export default class Level2 extends Phaser.Scene {
             console.log("morto");
             this.lives--;
             this.mainCam.stopFollow();
-            this.player.destroy();
+            if(this.player.scene!=undefined){
+                this.player.destroy();
+            }
+            
             this.player.pause=true;
             
             this.time.addEvent({
@@ -199,6 +208,7 @@ export default class Level2 extends Phaser.Scene {
         }else{
             this.time.addEvent({
                 delay: 100, loop: false, callback: () => {
+                    this.music.destroy();
                     this.scene.restart();
                 }, callbackScope: this
             });

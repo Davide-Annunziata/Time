@@ -93,9 +93,15 @@ export default class Level1 extends Phaser.Scene{
         
         this.enemyGroup= this.add.group({ runChildUpdate: true });
         this.setupObjects();
-        
-        this.physics.add.collider(this.layer2, this.enemyGroup,(_tile: any, enemy: any)=>{        
-        }, undefined, this);
+
+
+
+        this.physics.add.collider(this.enemyGroup,this.layer2,(enemy: any, _tile: any) => {
+            if (_tile.properties.worldBounds == true) {				
+                enemy.changeDirection();
+            }
+            },undefined,this
+        )
 
         this.physics.add.overlap(this.enemyGroup,this.layer2,(enemy: any, _tile: any) => {
             if (_tile.properties.worldBounds == true) {				
@@ -103,6 +109,7 @@ export default class Level1 extends Phaser.Scene{
             }
             },undefined,this
         )
+
         this.createCollider();
     }
 
@@ -116,7 +123,7 @@ export default class Level1 extends Phaser.Scene{
             if(this.player._body.blocked.down){
                 this.player.jmp=true;
             }
-            if (_tile.properties.exit == true&&this.points>=15) {	
+            if (_tile.properties.exit == true&&this.points>=16) {	
                 this.player.anims.play('idle', true);
                 //TODO			
                 this.music.destroy();
@@ -146,7 +153,7 @@ export default class Level1 extends Phaser.Scene{
             }
         },undefined,this
         );
-    
+        
         this.physics.add.overlap(this.player, this.groupBonus,(player: any, bonus: any)=>{
             let music=this.sound.add("tick",{loop:false,volume:1});
             music.play();
@@ -189,7 +196,10 @@ export default class Level1 extends Phaser.Scene{
             console.log("morto");
             this.lives--;
             this.mainCam.stopFollow();
-            this.player.destroy();
+            if(this.player.scene!=undefined){
+                this.player.destroy();
+            }
+            
             this.player.pause=true;
             
             this.time.addEvent({
@@ -203,6 +213,7 @@ export default class Level1 extends Phaser.Scene{
         }else{
             this.time.addEvent({
                 delay: 100, loop: false, callback: () => {
+                    this.music.destroy();
                     this.scene.restart();
                 }, callbackScope: this
             });
@@ -265,5 +276,6 @@ export default class Level1 extends Phaser.Scene{
 			});
 		}
 	}
+
 
 }
