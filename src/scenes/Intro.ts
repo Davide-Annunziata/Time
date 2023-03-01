@@ -13,7 +13,9 @@ export default class Intro extends Phaser.Scene {
 
   preload() {
   }
-  create() {  
+  create() {
+    let music: Phaser.Sound.BaseSound=this.sound.add("music0",{loop:true,volume:0.4});
+    music.play();
     this.logo=this.add.image(this.game.canvas.width/2-5,100,"logo-game").setScale(1);
     this.playText=this.add.text(this.game.canvas.width/2-5,230,"PLAY",{fontSize:"40px"})
     .setColor("Black")
@@ -21,6 +23,7 @@ export default class Intro extends Phaser.Scene {
     .setInteractive()
     .on("pointerdown",()=>{
       console.log("play");
+      music.destroy();
       this.scene.start("LevelSelection");
     });
 

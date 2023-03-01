@@ -12,11 +12,13 @@ export default class LevelSelection extends Phaser.Scene {
   preload() { }
 
   create() {
+    let music: Phaser.Sound.BaseSound=this.sound.add("music0",{loop:true,volume:0.4});
+    music.play();
     console.log("create:LevelSelection")
-    let level1=this.add.image(50,50,"nome").setInteractive().on("pointerdown",()=>{this.scene.start("Level1")});;
-    let level2=this.add.image(100,50,"nome").setInteractive().on("pointerdown",()=>{if(Level1.completed){} this.scene.start("Level2")});
-    let level3=this.add.image(150,50,"nome").setInteractive().on("pointerdown",()=>{if(Level2.completed){} this.scene.start("Level3") });
-    let boss=this.add.image(210,50,"nome").setInteractive().on("pointerdown",()=>{if(Level3.completed){}this.scene.start("Boss")});
+    let level1=this.add.image(50,50,"nome").setInteractive().on("pointerdown",()=>{music.destroy();this.scene.start("Level1");});;
+    let level2=this.add.image(100,50,"nome").setInteractive().on("pointerdown",()=>{if(Level1.completed){} music.destroy();this.scene.start("Level2")});
+    let level3=this.add.image(150,50,"nome").setInteractive().on("pointerdown",()=>{if(Level2.completed){} music.destroy();this.scene.start("Level3") });
+    let boss=this.add.image(210,50,"nome").setInteractive().on("pointerdown",()=>{if(Level3.completed){}music.destroy();this.scene.start("Boss")});
   }
 
   update(time: number, delta: number): void {

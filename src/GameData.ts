@@ -69,7 +69,7 @@ export let GameData: any = {
   ],
   atlas: [],
   sounds: [{
-    name: "music",
+    name: "music0",
     paths: ["assets/sounds/music0.ogg", "assets/sounds/music0.m4a"],
     },{
       name: "music1",
