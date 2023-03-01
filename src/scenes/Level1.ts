@@ -30,7 +30,7 @@ export default class Level1 extends Phaser.Scene{
     private cuori:Phaser.GameObjects.Image;
     private saved:boolean;
     public enemyGroup: Phaser.GameObjects.Group;
-
+    private x:boolean;
     constructor() {
         super({
         key: "Level1",
@@ -41,9 +41,9 @@ export default class Level1 extends Phaser.Scene{
         if(!Level1.completed){
             Level1.completed=false;
         }
-        this.player= new Player({ scene: this, x: 100, y: 500, key: "player" });
-        this.posX=this.player._body.position.x+10;
-        this.posY=this.player._body.position.y;
+        this.player= new Player({ scene: this, x: 100, y: 455, key: "player" });
+        this.posX=100;
+        this.posY=455;
         this.lives=3;
         this.physics.add.existing(this.player);
         this.music=this.sound.add("music1",{loop:true,volume:.3});
@@ -94,8 +94,6 @@ export default class Level1 extends Phaser.Scene{
         this.enemyGroup= this.add.group({ runChildUpdate: true });
         this.setupObjects();
 
-
-
         this.physics.add.collider(this.enemyGroup,this.layer2,(enemy: any, _tile: any) => {
             if (_tile.properties.worldBounds == true) {				
                 enemy.changeDirection();
@@ -109,7 +107,7 @@ export default class Level1 extends Phaser.Scene{
             }
             },undefined,this
         )
-
+        this.x=false;
         this.createCollider();
     }
 
@@ -136,7 +134,16 @@ export default class Level1 extends Phaser.Scene{
                 .setDepth(9)
                 .setScale(0.3)
                 .setDepth(98);
-
+            }else if(_tile.properties.exit == true&&this.points<15&&this.player.scene!=undefined&&!this.x){
+                console.log("ho bisono di altri frammenti");
+                this.x=true;
+                let text:Phaser.GameObjects.Text=this.add.text(this.player.body.position.x-90,this.player.body.position.y-70,"ho bisogno di piu frammenti!",{fontSize:"12px"}).setTint(0x0000).setDepth(15);  
+                this.time.addEvent({
+                    delay: 1000, loop: true, callback: () => {
+                        text.destroy(); 
+                        this.x=false;
+                    }, callbackScope: this
+                });   
             }else if(_tile.properties.check==true&&!this.saved){
                 this.saved=true;
                 this.posX=this.player._body.position.x;
@@ -174,7 +181,7 @@ export default class Level1 extends Phaser.Scene{
     update(time: number, delta: number): void {
         this.player.update(time,delta);
        
-        if(this.keyEsc.isDown&&this.HUD.alpha==0){
+        if(this.keyEsc.isDown&&this.HUD.alpha==0&&this.player.scene!=undefined){
             this.createHUD();
             this.player.pause=true;
             this.player.anims.play('idle', true);
@@ -192,7 +199,7 @@ export default class Level1 extends Phaser.Scene{
     }
     
     checkLives(){
-        if(this.lives>1){
+        if(this.lives>=1){
             console.log("morto");
             this.lives--;
             this.mainCam.stopFollow();

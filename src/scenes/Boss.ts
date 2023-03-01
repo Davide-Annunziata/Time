@@ -1,10 +1,12 @@
 import Player from "../components/Player";
 import BossC from "../components/BossC";
+import Enemy from "../components/Enemy";
 
 export default class Boss extends Phaser.Scene {
     private mainCam:Phaser.Cameras.Scene2D.Camera;
     private player:Player;
     private music: Phaser.Sound.BaseSound;
+    private bossMusic: Phaser.Sound.BaseSound;
     private HUD :Phaser.GameObjects.Container;
     private continua :Phaser.GameObjects.Image;
     private esci: Phaser.GameObjects.Image;
@@ -35,7 +37,7 @@ export default class Boss extends Phaser.Scene {
     private lives:integer;
     private cuori:Phaser.GameObjects.Image;
     private saved:boolean;
-
+    public enemyGroup: Phaser.GameObjects.Group;
     constructor() {
         super({
         key: "Boss",
@@ -43,22 +45,21 @@ export default class Boss extends Phaser.Scene {
     }
 
     preload() {      
-        let x=500;
-        let y=550;
-        this.player= new Player({ scene: this, x: 100, y: 500, key: "player" });
-        this.boss=new BossC(({ scene: this, x: x, y: y, key: "player" }));
+        this.player= new Player({ scene: this, x: 100, y: 775, key: "player" });
+        this.boss=new BossC(({ scene: this, x: 2335, y: 635, key: "player" }));
         this.triggered=false;
-        this.posX=this.player._body.position.x+10;
-        this.posY=this.player._body.position.y;
+        this.posX=100;
+        this.posY=775;
         this.lives=3;
         this.saved=false;
         this.bg=this.add.image(0, 0,"bg2").setOrigin(0,0).setDepth(0);
         this.groupProj= this.add.group();
         this.physics.add.existing(this.player);
         this.music=this.sound.add("music3",{loop:true,volume:0.4});
+        this.bossMusic=this.sound.add("music4",{loop:true,volume:0.4});
         this.music.play();
         this.playing=false;
-        this.map = this.make.tilemap({ key: "level-1"});
+        this.map = this.make.tilemap({ key: "level-4"});
         this.keyEsc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
         this.cursors = this.input.keyboard.createCursorKeys();
         this.mainCam = this.cameras.main;
@@ -69,8 +70,8 @@ export default class Boss extends Phaser.Scene {
             this.map.heightInPixels //height
             );
         this.mainCam.startFollow(this.player);
-        this.cloud=this.physics.add.image(90,655,"nuvola").setOrigin(0.5,0.5).setDepth(12).setAlpha(0).setImmovable(true).setScale(1.25);
-        this.cuori=this.add.image(this.cameras.main.worldView.x+75,this.cameras.main.worldView.y+35,"3cuori");
+        this.cloud=this.physics.add.image(3616,800,"nuvola").setOrigin(0.5,0.5).setDepth(12).setAlpha(0).setImmovable(true).setScale(1.25);
+        this.cuori=this.add.image(this.cameras.main.worldView.x+75,this.cameras.main.worldView.y+35,"3cuori").setDepth(20);
 
         this.physics.world.setBounds(
             0, //x
@@ -93,7 +94,7 @@ export default class Boss extends Phaser.Scene {
         .createLayer("collision", this.tileset, 0, 0)
         .setDepth(0)
         .setAlpha(0);
-
+            
         this.layer2.setCollisionByProperty({collide: true });
 
         this.physics.add.collider(this.groupProj,this.boss,(proj: any, boss: any) => {	
@@ -131,9 +132,30 @@ export default class Boss extends Phaser.Scene {
             }
             },undefined,this
         )
+        this.enemyGroup= this.add.group({ runChildUpdate: true });
+        this.physics.add.collider(this.enemyGroup,this.layer2,(enemy: any, _tile: any) => {
+            if (_tile.properties.worldBounds == true) {				
+                enemy.changeDirection();
+            }
+            },undefined,this
+        )
 
+        this.physics.add.overlap(this.enemyGroup,this.layer2,(enemy: any, _tile: any) => {
+            if (_tile.properties.worldBounds == true) {				
+                enemy.changeDirection();
+            }
+            },undefined,this
+        )
+
+        this.physics.add.collider(this.groupProj,this.enemyGroup,(proj: any, enemy: any) => {
+            proj.destroy();
+            enemy.destroy();
+            },undefined,this
+        )
         this.createCollider();
-
+        this.setupObjects();
+        
+        
         this.time.addEvent({
             delay: 3000, loop: true, callback: () => {
                 if(this.boss.life>0&&!this.player.pause&&this.triggered&&this.boss.scene!=undefined){
@@ -168,11 +190,11 @@ export default class Boss extends Phaser.Scene {
                 if(this.player.scene!=undefined&&this.boss.scene!=undefined){
                     this.boss.changeDir(this.player.body.position.x<this.boss.body.position.x);
                 }
-                if(!this.triggered&&this.player.scene!=undefined&&this.player.body.position.x>100&&this.boss.scene!=undefined){
+                if(!this.triggered&&this.player.scene!=undefined&&this.player.body.position.x>1800&&this.boss.scene!=undefined){
                     this.boss.anims.play("move");
                     this.triggered=true;
-                    this.music=this.sound.add("music4",{loop:true,volume:0.4});
-                    this.music.play();
+                    this.music.stop()
+                    this.bossMusic.play();
                 }
             }, callbackScope: this
         }); 
@@ -184,6 +206,15 @@ export default class Boss extends Phaser.Scene {
     }
 
     createCollider(){
+        this.physics.add.collider(this.player, this.enemyGroup,(player: any, enemy: any)=>{       
+            if(this.player._body.blocked.down&&!this.player._body.blocked.up&&!this.player._body.blocked.right&&!this.player._body.blocked.left){
+                console.log(1)
+                enemy.destroy();
+            }else{
+                this.checkLives();
+            }
+        }, undefined, this);
+
         this.physics.add.collider(this.player,this.layer2,(_player: any, _tile: any) => {
             if(this.player._body.blocked.down){
                 this.player.jmp=true;
@@ -194,7 +225,7 @@ export default class Boss extends Phaser.Scene {
                 console.log("level completed");
                 this.player.pause=true;
                 let base=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+15,"base").setOrigin(0.5,0.5).setDepth(12);
-                this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-15,"continua").setInteractive().on("pointerdown",()=>{this.scene.remove;this.scene.start("LevelSelection")})
+                this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-15,"continua").setInteractive().on("pointerdown",()=>{this.music.destroy();this.bossMusic.destroy();this.scene.remove;this.scene.start("LevelSelection")})
                 .setOrigin(0.5,0.5)
                 .setDepth(9)
                 .setScale(0.3)
@@ -266,8 +297,9 @@ export default class Boss extends Phaser.Scene {
                 });
             }
         }, undefined, this);
-        
-        this.physics.add.collider(this.player,this.cloud,(obj1: any, obj2: any) => {if(this.player._body.blocked.down){this.player.jmp=true; } },undefined,this);
+        if(this.boss.scene==undefined){
+            this.physics.add.collider(this.player,this.cloud,(obj1: any, obj2: any) => {if(this.player._body.blocked.down){this.player.jmp=true; } },undefined,this);
+        }
     }
 
     update(time: number, delta: number): void {
@@ -281,7 +313,7 @@ export default class Boss extends Phaser.Scene {
             this.win=true;
         }      
 
-        if(this.keyEsc.isDown&&this.HUD.alpha==0){
+        if(this.keyEsc.isDown&&this.HUD.alpha==0&&this.player.scene!=undefined){
             this.createHUD();
             this.player.pause=true;
             this.player.anims.play('idle', true);
@@ -305,7 +337,7 @@ export default class Boss extends Phaser.Scene {
         this.HUD=this.add.container().setAlpha(1);
         this.base=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+15,"base").setOrigin(0.5,0.5).setDepth(12);
         this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-15,"continua").setInteractive().on("pointerdown",()=>{this.HUD.setAlpha(0);console.log(1);this.player.pause=false;}).setOrigin(0.5,0.5).setDepth(9).setScale(0.3);
-        this.esci=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+85,"esci").setInteractive().on("pointerdown",()=>{this.music.destroy();this.scene.remove;this.scene.start("LevelSelection")}).setOrigin(0.5,0.5).setDepth(9).setScale(0.3);    
+        this.esci=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+85,"esci").setInteractive().on("pointerdown",()=>{this.music.destroy();this.bossMusic.destroy();this.scene.remove;this.scene.start("LevelSelection")}).setOrigin(0.5,0.5).setDepth(9).setScale(0.3);    
         this.HUD.add([this.base,this.continua,this.esci]);
         this.HUD.setAlpha(0).setDepth(100);
     }
@@ -365,37 +397,35 @@ export default class Boss extends Phaser.Scene {
             duration: 4000,
             repeat: 0,
             ease: "Linear",
-            y: 300,
+            y: 544,
             onComplete: () => {
                 this.tweens.add({
                     targets: this.cloud,
                     duration: 4000,
                     repeat: 0,
                     ease: "Linear",
-                    y: 655,
+                    y: 800,
                     onComplete: () => {
                         this.createCloud();     
                     }
                 });
             }    
         });
-
-        
     }
 
     changeLives(){
         this.cuori.destroy();
         if(this.lives==3){
-            this.cuori=this.add.image(this.cameras.main.worldView.x+75,this.cameras.main.worldView.y+35,"3cuori");
+            this.cuori=this.add.image(this.cameras.main.worldView.x+75,this.cameras.main.worldView.y+35,"3cuori").setDepth(20);;
         }else if(this.lives==2){
-            this.cuori=this.add.image(this.cameras.main.worldView.x+55,this.cameras.main.worldView.y+35,"2cuori");
+            this.cuori=this.add.image(this.cameras.main.worldView.x+55,this.cameras.main.worldView.y+35,"2cuori").setDepth(20);;
         }else if(this.lives==1){
-            this.cuori=this.add.image(this.cameras.main.worldView.x+35,this.cameras.main.worldView.y+35,"1cuore");
+            this.cuori=this.add.image(this.cameras.main.worldView.x+35,this.cameras.main.worldView.y+35,"1cuore").setDepth(20);;
         }
     }
 
     checkLives(){
-        if(this.lives>1){
+        if(this.lives>=1){
             console.log("morto");
             this.lives--;
             this.mainCam.stopFollow();
@@ -422,4 +452,15 @@ export default class Boss extends Phaser.Scene {
             });
         }
     }
+
+    setupObjects(): void {
+		let enLayer: Phaser.Tilemaps.ObjectLayer = this.map.getObjectLayer("enemy");
+		if (enLayer != null) {
+			let _objects: any = enLayer.objects as any[];
+			_objects.forEach((tile: Phaser.Tilemaps.Tile) => {
+
+                this.enemyGroup.add(new Enemy({ scene: this,  x: tile.x, y: tile.y, key: "enemy" })); 
+			});
+		}
+	}
 }

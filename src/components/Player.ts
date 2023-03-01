@@ -17,8 +17,8 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
     public jmp:boolean;
 	//array di oggetti per la creazione dell’animazione
 	private _animations: Array<{ key: string, frames: Array<number>, frameRate: number, yoyo: boolean, repeat: number }> = [
-	{ key: "move", frames: [0, 1, 2, 3, 4, 5,7], frameRate: 10, yoyo: false, repeat: -1 },
-	{ key: "idle", frames: [8,9,10,11,12,13], frameRate: 10, yoyo: false, repeat: -1 }
+	{ key: "move", frames: [0, 1, 2], frameRate: 10, yoyo: false, repeat: -1 },
+	{ key: "idle", frames: [0], frameRate: 10, yoyo: false, repeat: -1 }
 	];
 
     public right:boolean;
@@ -44,9 +44,9 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
 		this._body = <Phaser.Physics.Arcade.Body>this.body;
         this._body.setAllowGravity(true).setAccelerationY(130).setGravityY(300);
 	
-		this._body.setCollideWorldBounds(true).setSize(46,62);
+		this._body.setCollideWorldBounds(true).setSize(464,625);
 		this._cursors = this._scene.input.keyboard.createCursorKeys();
-		this.setDepth(3);
+		this.setDepth(3).setScale(0.1);
 		this.pause=false;
 		this._scene.add.existing(this);
 	}

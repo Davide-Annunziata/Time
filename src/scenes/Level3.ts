@@ -31,6 +31,8 @@ export default class Level3 extends Phaser.Scene {
     private cuori:Phaser.GameObjects.Image;
     private saved:boolean;
     public enemyGroup: Phaser.GameObjects.Group;
+    private cloud: Phaser.GameObjects.Image;
+    private x:boolean;
 
     constructor() {
         super({
@@ -42,15 +44,15 @@ export default class Level3 extends Phaser.Scene {
         if(!Level3.completed){
             Level3.completed=false;
         }    
-        this.player= new Player({ scene: this, x:50, y: 595, key: "player" });
-        this.posX=this.player._body.position.x+10;
-        this.posY=this.player._body.position.y;
+        this.player= new Player({ scene: this, x:55, y: 570, key: "player" });
+        this.posX=55;
+        this.posY=570;
         this.lives=3;
         this.saved=false;
         this.physics.add.existing(this.player);
         this.music=this.sound.add("music3",{loop:true,volume:0.1});
         this.music.play();
-        this.map = this.make.tilemap({ key: "level-2"});
+        this.map = this.make.tilemap({ key: "level-3"});
         this.keyEsc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
         this.points=0;
         this.textPoints=this.add.bitmapText(this.cameras.main.worldView.x+125,this.cameras.main.worldView.y+75, "arcade", "Frammenti: "+this.points, 18).setDepth(15)
@@ -58,7 +60,7 @@ export default class Level3 extends Phaser.Scene {
         .setDepth(15)
         .setOrigin(0.5,0.5)
         .setTint(0x0000);
-        this.cuori=this.add.image(this.cameras.main.worldView.x+75,this.cameras.main.worldView.y+35,"3cuori");
+        this.cuori=this.add.image(this.cameras.main.worldView.x+75,this.cameras.main.worldView.y+35,"3cuori").setDepth(20);;
         this.mainCam = this.cameras.main;
         this.mainCam.setBounds(
             0, //x
@@ -76,6 +78,8 @@ export default class Level3 extends Phaser.Scene {
             this.map.heightInPixels //height
         );
         this.jmp=true;
+        this.cloud=this.physics.add.image(648,550,"nuvola").setOrigin(0.5,0.5).setDepth(12).setImmovable(true).setScale(1.25);
+        this.createCloud();
 
         this.tileset = this.map.addTilesetImage("tilemap-extruded");
         this.layer = this.map
@@ -93,22 +97,9 @@ export default class Level3 extends Phaser.Scene {
         this.groupBonus = this.add.group({ runChildUpdate: true });
         this.enemyGroup= this.add.group({ runChildUpdate: true });
         this.setupObjects();
-        
-        this.physics.add.collider(this.enemyGroup,this.layer2,(enemy: any, _tile: any) => {
-            if (_tile.properties.worldBounds == true) {				
-                enemy.changeDirection();
-            }
-            },undefined,this
-        )
-
-        this.physics.add.overlap(this.enemyGroup,this.layer2,(enemy: any, _tile: any) => {
-            if (_tile.properties.worldBounds == true) {				
-                enemy.changeDirection();
-            }
-            },undefined,this
-        )
-
+        this.x=false;
         this.createCollider();
+        
     }
 
     create() {
@@ -134,7 +125,16 @@ export default class Level3 extends Phaser.Scene {
                 .setDepth(9)
                 .setScale(0.3)
                 .setDepth(98);
-
+            }else if(_tile.properties.exit == true&&this.points<15&&this.player.scene!=undefined&&!this.x){
+                console.log("ho bisono di altri frammenti");
+                this.x=true;
+                let text:Phaser.GameObjects.Text=this.add.text(this.player.body.position.x-90,this.player.body.position.y-35,"ho bisogno di piu frammenti!",{fontSize:"12px"}).setTint(0x0000).setDepth(15);;  
+                this.time.addEvent({
+                    delay: 1000, loop: true, callback: () => {
+                        text.destroy(); 
+                        this.x=false;
+                    }, callbackScope: this
+                });   
             }else if(_tile.properties.check==true&&!this.saved){
                 this.saved=true;
                 this.posX=this.player._body.position.x;
@@ -149,8 +149,9 @@ export default class Level3 extends Phaser.Scene {
             }else if(_tile.properties.kill==true){
                 this.checkLives()
             }
-        },undefined,this
+            },undefined,this
         );
+        this.physics.add.collider(this.player,this.cloud,(obj1: any, obj2: any) => {if(this.player._body.blocked.down){this.player.jmp=true; } },undefined,this);
 
         this.physics.add.overlap(this.player, this.groupBonus,(player: any, bonus: any)=>{
             let music=this.sound.add("tick",{loop:false,volume:1});
@@ -172,7 +173,7 @@ export default class Level3 extends Phaser.Scene {
     update(time: number, delta: number): void {
         this.player.update(time,delta);
 
-        if(this.keyEsc.isDown&&this.HUD.alpha==0){
+        if(this.keyEsc.isDown&&this.HUD.alpha==0&&this.player.scene!=undefined){
             this.createHUD();
             this.player.pause=true;
             this.player.anims.play('idle', true);
@@ -187,14 +188,15 @@ export default class Level3 extends Phaser.Scene {
             this.player._body.allowGravity=true;
         }
         this.changePoint();
-        if(this.player._body.position.x>3950&&this.player._body.position.y>610){
+    
+        if(this.player._body.position.x>3798&&this.player._body.position.y>610){
             this.mainCam.setBounds(
                 0, //x
                 0, //y
                 this.map.widthInPixels, //width
                 this.map.heightInPixels //height
             );
-        }else if(this.player._body.position.x<3950&&this.player._body.position.y<620){
+        }else if(this.player._body.position.x<3798&&this.player._body.position.y<=610){
             this.mainCam.setBounds(
                 0, //x
                 -258, //y
@@ -205,7 +207,7 @@ export default class Level3 extends Phaser.Scene {
     }
 
     checkLives(){
-        if(this.lives>1){
+        if(this.lives>=1){
             console.log("morto");
             this.lives--;
             this.mainCam.stopFollow();
@@ -284,5 +286,43 @@ export default class Level3 extends Phaser.Scene {
                 this.enemyGroup.add(new Enemy({ scene: this,  x: tile.x, y: tile.y, key: "enemy" })); 
 			});
 		}
+
+        this.physics.add.collider(this.enemyGroup,this.layer2,(enemy: any, _tile: any) => {
+            if (_tile.properties.worldBounds == true) {				
+                enemy.changeDirection();
+            }
+            },undefined,this
+        )
+
+        this.physics.add.overlap(this.enemyGroup,this.layer2,(enemy: any, _tile: any) => {
+            if (_tile.properties.worldBounds == true) {				
+                enemy.changeDirection();
+            }
+            },undefined,this
+        )
 	}
+
+    
+    createCloud(){
+        
+        this.tweens.add({
+            targets: this.cloud,
+            duration: 4000,
+            repeat: 0,
+            ease: "Linear",
+            y: 330,
+            onComplete: () => {
+                this.tweens.add({
+                    targets: this.cloud,
+                    duration: 4000,
+                    repeat: 0,
+                    ease: "Linear",
+                    y: 530,
+                    onComplete: () => {
+                        this.createCloud();     
+                    }
+                });
+            }    
+        });
+    }
 }
