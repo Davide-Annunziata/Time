@@ -99,7 +99,7 @@ export default class Boss extends Phaser.Scene {
 
         this.physics.add.collider(this.groupProj,this.boss,(proj: any, boss: any) => {	
             proj.destroy();
-            boss.life-=50;
+            boss.life-=15;
             console.log(this.boss.life);
             },undefined,this
         );
