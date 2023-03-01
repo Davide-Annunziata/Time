@@ -199,6 +199,7 @@ export default class Level1 extends Phaser.Scene{
     }
     
     checkLives(){
+        this.HUD.setAlpha(0)
         if(this.lives>=1){
             console.log("morto");
             this.lives--;

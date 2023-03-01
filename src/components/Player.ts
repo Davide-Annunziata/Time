@@ -15,6 +15,10 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
 	private _velocity: number = 200
     public pause:boolean;
     public jmp:boolean;
+    private keyW:Phaser.Input.Keyboard.Key;
+    private keyA:Phaser.Input.Keyboard.Key;
+    private keyD:Phaser.Input.Keyboard.Key;
+
 	//array di oggetti per la creazione dell’animazione
 	private _animations: Array<{ key: string, frames: Array<number>, frameRate: number, yoyo: boolean, repeat: number }> = [
 	{ key: "move", frames: [0, 1, 2], frameRate: 10, yoyo: false, repeat: -1 },
@@ -35,6 +39,7 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
             }
 
 	create() {
+        
         this.jmp=true;
         this.right=true;
 		this._scene = <Level1>this._config.scene;
@@ -44,10 +49,13 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
 		this._body = <Phaser.Physics.Arcade.Body>this.body;
         this._body.setAllowGravity(true).setAccelerationY(130).setGravityY(300);
 	
-		this._body.setCollideWorldBounds(true).setSize(464,625);
+		this._body.setCollideWorldBounds(true).setSize(464,626);
 		this._cursors = this._scene.input.keyboard.createCursorKeys();
-		this.setDepth(3).setScale(0.1);
+		this.setDepth(10).setScale(0.1);
 		this.pause=false;
+        this.keyW = this._scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+        this.keyA = this._scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+        this.keyD = this._scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
 		this._scene.add.existing(this);
 	}
 	
@@ -70,7 +78,7 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
 	}
     update(time: number, delta: number) {
         if(this.scene!=undefined&&!this.pause){
-            if (this._cursors.left.isDown) {
+            if (this._cursors.left.isDown||this.keyA.isDown) {
                 this._body.setAccelerationY(130);
                 this.right=false;
                 this.setFlipX(true);
@@ -80,7 +88,7 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
                 this._body.setVelocityX(-this._velocity);
                 }
             //se il il cursore destro è premuto
-            if (this._cursors.right.isDown) {
+            if (this._cursors.right.isDown||this.keyD.isDown) {
                 this._body.setAccelerationY(130);
                 this.right=true;
                 this.setFlipX(false);
@@ -91,9 +99,9 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
             }
             
             //se il il cursore in alto è premuto
-            if (this._cursors.up.isDown) {
+            if (this._cursors.up.isDown||this.keyW.isDown) {
                 if(this.jmp&&!this.pause){
-                    if (this._cursors.up.isDown) {
+                    if (this._cursors.up.isDown||this.keyW.isDown) {
                         this.jmp=false
                         this._body.setVelocityY(-300)
                     }
@@ -102,10 +110,9 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
             }
             
 
-            if (!this._cursors.left.isDown && !this._cursors.right.isDown && !this._cursors.up.isDown && !this._cursors.down.isDown) {                  
+            if (!this._cursors.left.isDown && !this._cursors.right.isDown && !this._cursors.up.isDown && !this._cursors.down.isDown&&!this.keyA.isDown&&!this.keyW.isDown&&!this.keyD.isDown) {                  
                 this._body.setVelocityX(0);                
                 this.anims.play('idle', true);
-
             }
         }
     }

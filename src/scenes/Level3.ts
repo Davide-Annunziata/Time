@@ -78,7 +78,7 @@ export default class Level3 extends Phaser.Scene {
             this.map.heightInPixels //height
         );
         this.jmp=true;
-        this.cloud=this.physics.add.image(648,550,"nuvola").setOrigin(0.5,0.5).setDepth(12).setImmovable(true).setScale(1.25);
+        this.cloud=this.physics.add.image(648,570,"nuvola").setOrigin(0.5,0.5).setDepth(12).setImmovable(true).setScale(1.25);
         this.createCloud();
 
         this.tileset = this.map.addTilesetImage("tilemap-extruded");
@@ -207,6 +207,7 @@ export default class Level3 extends Phaser.Scene {
     }
 
     checkLives(){
+        this.HUD.setAlpha(0)
         if(this.lives>=1){
             console.log("morto");
             this.lives--;
@@ -317,7 +318,7 @@ export default class Level3 extends Phaser.Scene {
                     duration: 4000,
                     repeat: 0,
                     ease: "Linear",
-                    y: 530,
+                    y: 570,
                     onComplete: () => {
                         this.createCloud();     
                     }

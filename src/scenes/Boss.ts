@@ -70,7 +70,7 @@ export default class Boss extends Phaser.Scene {
             this.map.heightInPixels //height
             );
         this.mainCam.startFollow(this.player);
-        this.cloud=this.physics.add.image(3616,800,"nuvola").setOrigin(0.5,0.5).setDepth(12).setAlpha(0).setImmovable(true).setScale(1.25);
+        this.cloud=this.physics.add.image(3616,825,"nuvola").setOrigin(0.5,0.5).setDepth(12).setAlpha(0).setImmovable(true).setScale(1.25);
         this.cuori=this.add.image(this.cameras.main.worldView.x+75,this.cameras.main.worldView.y+35,"3cuori").setDepth(20);
 
         this.physics.world.setBounds(
@@ -81,7 +81,7 @@ export default class Boss extends Phaser.Scene {
         );
         this.groupThunder = this.add.group();
         this.groupFire=this.add.group();
-        this.shot=false;
+        this.shot=true;
         this.win=false;
         this.tileset = this.map.addTilesetImage("tilemap-extruded");
 
@@ -99,7 +99,7 @@ export default class Boss extends Phaser.Scene {
 
         this.physics.add.collider(this.groupProj,this.boss,(proj: any, boss: any) => {	
             proj.destroy();
-            boss.life-=15;
+            boss.life-=9;
             console.log(this.boss.life);
             },undefined,this
         );
@@ -174,16 +174,11 @@ export default class Boss extends Phaser.Scene {
                         });
                     }
                 } 
+                if(this.boss.scene==undefined){
+                    this.physics.add.collider(this.player,this.cloud,(obj1: any, obj2: any) => {if(this.player._body.blocked.down){this.player.jmp=true; } },undefined,this);
+                }
             }, callbackScope: this
         });
-        
-        this.time.addEvent({
-            delay: 1000, loop: true, callback: () => {
-                if(this.boss.life>0&&!this.player.pause&&!this.shot){
-                   this.shot=true;
-                } 
-            }, callbackScope: this
-        });     
 
         this.time.addEvent({
             delay: 500, loop: true, callback: () => {
@@ -231,6 +226,7 @@ export default class Boss extends Phaser.Scene {
                 .setScale(0.3)
                 .setDepth(98);
             }else if(_tile.properties.check==true&&!this.saved){
+                console.log("saved");
                 this.saved=true;
                 this.posX=this.player._body.position.x;
                 this.posY=this.player._body.position.y;
@@ -297,9 +293,6 @@ export default class Boss extends Phaser.Scene {
                 });
             }
         }, undefined, this);
-        if(this.boss.scene==undefined){
-            this.physics.add.collider(this.player,this.cloud,(obj1: any, obj2: any) => {if(this.player._body.blocked.down){this.player.jmp=true; } },undefined,this);
-        }
     }
 
     update(time: number, delta: number): void {
@@ -351,6 +344,13 @@ export default class Boss extends Phaser.Scene {
             proj.body.allowGravity = false;
             proj.body.setVelocityX(300);
             this.groupProj.add(proj);
+            this.time.addEvent({
+                delay: 1000, loop: false, callback: () => {
+                    if(this.boss.life>0&&!this.player.pause&&!this.shot){
+                       this.shot=true;
+                    } 
+                }, callbackScope: this
+            });     
             }else{
                 this.shot=false;
                 let proj = this.physics.add.image(this.player.body.position.x-10,this.player.body.position.y+20,"logo-game" );
@@ -358,6 +358,13 @@ export default class Boss extends Phaser.Scene {
                 proj.body.allowGravity = false;
                 proj.body.setVelocityX(-300);
                 this.groupProj.add(proj);
+                this.time.addEvent({
+                    delay: 1000, loop: false, callback: () => {
+                        if(this.boss.life>0&&!this.player.pause&&!this.shot){
+                           this.shot=true;
+                        } 
+                    }, callbackScope: this
+                });     
             }
         }
     }
@@ -425,6 +432,7 @@ export default class Boss extends Phaser.Scene {
     }
 
     checkLives(){
+        this.HUD.setAlpha(0)
         if(this.lives>=1){
             console.log("morto");
             this.lives--;
