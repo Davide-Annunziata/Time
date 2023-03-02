@@ -229,13 +229,25 @@ export default class Level1 extends Phaser.Scene{
     }
 
     createHUD(){
-        this.HUD=this.add.container().setAlpha(1);
+        let y=this.player.body.position.y;
+        this.HUD=this.add.container().setAlpha(0);
         this.base=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+15,"base").setOrigin(0.5,0.5).setDepth(12);
         this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-15,"continua").setInteractive().on("pointerdown",()=>{this.HUD.setAlpha(0);console.log(1);this.player.pause=false;}).setOrigin(0.5,0.5).setDepth(9).setScale(0.3);
         this.esci=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+85,"esci").setInteractive().on("pointerdown",()=>{this.music.destroy();this.scene.remove;this.scene.start("LevelSelection")}).setOrigin(0.5,0.5).setDepth(9).setScale(0.3);
-        
         this.HUD.add([this.base,this.continua,this.esci]);
         this.HUD.setAlpha(0).setDepth(15);
+        
+        this.time.addEvent({
+            delay: 150, loop: false, callback: () => {
+                if(this.HUD.alpha==1&&y!=this.player.body.position.y){
+                    this.HUD.destroy();
+                    this.createHUD();
+                    this.HUD.setAlpha(1);              
+                }
+                    
+                
+            }, callbackScope: this
+        });
     }
 
     changePoint(){
