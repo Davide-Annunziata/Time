@@ -112,7 +112,7 @@ export default class Level3 extends Phaser.Scene {
             if(this.player._body.blocked.down){
                 this.player.jmp=true;
             }
-            if (_tile.properties.exit == true&&this.points>=15) {	
+            if (_tile.properties.exit == true&&this.points>=24) {	
                 this.player.anims.play('idle', true);
                 //TODO			
                 this.music.destroy();
@@ -125,7 +125,7 @@ export default class Level3 extends Phaser.Scene {
                 .setDepth(9)
                 .setScale(0.3)
                 .setDepth(98);
-            }else if(_tile.properties.exit == true&&this.points<15&&this.player.scene!=undefined&&!this.x){
+            }else if(_tile.properties.exit == true&&this.points<24&&this.player.scene!=undefined&&!this.x){
                 console.log("ho bisono di altri frammenti");
                 this.x=true;
                 let text:Phaser.GameObjects.Text=this.add.text(this.player.body.position.x-90,this.player.body.position.y-35,"ho bisogno di piu frammenti!",{fontSize:"12px"}).setTint(0x0000).setDepth(15);;  
