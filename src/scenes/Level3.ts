@@ -153,7 +153,6 @@ export default class Level3 extends Phaser.Scene {
 
         this.physics.add.collider(this.player, this.enemyGroup,(player: any, enemy: any)=>{       
             if(this.player._body.blocked.down&&!this.player._body.blocked.up&&!this.player._body.blocked.right&&!this.player._body.blocked.left){
-                console.log(1)
                 enemy.destroy();
             }else{
                 this.checkLives();
@@ -214,7 +213,7 @@ export default class Level3 extends Phaser.Scene {
             this.time.addEvent({
                 delay: 100, loop: false, callback: () => {
                     Overlay.updateScore(this.points,this.lives,false,false);
-                    this.music.destroy();
+                    this.music.stop();
                     this.scene.restart();
                 }, callbackScope: this
             });

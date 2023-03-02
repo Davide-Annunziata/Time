@@ -211,7 +211,7 @@ export default class Level1 extends Phaser.Scene{
             this.time.addEvent({
                 delay: 100, loop: false, callback: () => {
                     Overlay.updateScore(this.points,this.lives,false,false);
-                    this.music.destroy();
+                    this.music.stop();
                     this.scene.restart();
                 }, callbackScope: this
             });
