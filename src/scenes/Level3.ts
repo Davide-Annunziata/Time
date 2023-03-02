@@ -138,6 +138,10 @@ export default class Level3 extends Phaser.Scene {
                
                 console.log("saved");
             }else if(_tile.properties.kill==true){
+                if(this.lives<0){
+                    this.music.stop();
+                }
+                this.player.pause=true;
                 this.checkLives()
             }
             },undefined,this
@@ -161,17 +165,23 @@ export default class Level3 extends Phaser.Scene {
     }
 
     update(time: number, delta: number): void {
-        if(!this.music.isPlaying){
+        if(!this.music.isPlaying&&!this.player.pause){
             this.music.play();        
         }
         this.player.update(time,delta);
         Overlay.updateScore(this.points,this.lives,true,(this.keyEsc.isDown&&this.player.scene!=undefined));
         if(this.keyEsc.isDown&&this.player.scene!=undefined){
-            this.scene.launch("PauseHud");
+            this.player.pause=true;
             this.music.stop()
+            this.scene.launch("PauseHud");
+            this.time.addEvent({
+                delay: 100, loop: false, callback: () => {
+                    this.player.pause=false;                    
+                }, callbackScope: this
+            });
             this.scene.pause();
+            
         }
-
         if(this.player._body.position.x>3798&&this.player._body.position.y>610){
             this.mainCam.setBounds(
                 0, //x
@@ -210,10 +220,11 @@ export default class Level3 extends Phaser.Scene {
                 }, callbackScope: this
             });
         }else{
+            this.music.stop();
             this.time.addEvent({
-                delay: 100, loop: false, callback: () => {
+                delay: 200, loop: false, callback: () => {
                     Overlay.updateScore(this.points,this.lives,false,false);
-                    this.music.stop();
+                    this.music.stop()
                     this.scene.restart();
                 }, callbackScope: this
             });

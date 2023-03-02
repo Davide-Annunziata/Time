@@ -192,11 +192,11 @@ export default class Boss extends Phaser.Scene {
                 if(this.player.scene!=undefined&&this.boss.scene!=undefined){
                     this.boss.changeDir(this.player.body.position.x<this.boss.body.position.x);
                 }
-                if(!this.triggered&&this.player.scene!=undefined&&this.player.body.position.x>1800&&this.boss.scene!=undefined){
+                if(!this.triggered&&this.player.scene!=undefined&&this.player.body.position.x>1700&&this.boss.scene!=undefined){
                     this.boss.anims.play("move");
                     this.triggered=true;
-                    this.music.stop()
-                    this.bossMusic.play();
+                    this.music.stop();
+                    this.bossMusic.stop();
                 }
             }, callbackScope: this
         }); 
@@ -226,7 +226,8 @@ export default class Boss extends Phaser.Scene {
                 console.log("level completed");
                 this.player.pause=true;
                 let base=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+15,"base").setOrigin(0.5,0.5).setDepth(12);
-                this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-15,"continua").setInteractive().on("pointerdown",()=>{Overlay.updateScore(this.points,this.lives,false,false);this.scene.remove;this.scene.start("LevelSelection");this.bossMusic.stop();})
+                this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-15,"continua").setInteractive().on("pointerdown",()=>{Overlay.updateScore(this.points,this.lives,false,false);this.music.stop();
+                this.bossMusic.stop();this.scene.remove;this.scene.start("LevelSelection");})
                 .setOrigin(0.5,0.5)
                 .setDepth(9)
                 .setScale(0.3)
@@ -254,6 +255,11 @@ export default class Boss extends Phaser.Scene {
                
                 console.log("saved");
             }else if(_tile.properties.kill==true){
+                if(this.lives<0){
+                    this.music.stop();
+                    this.bossMusic.stop();
+                }
+                this.player.pause=true;
                 this.checkLives()
             }
         },undefined,this
@@ -318,21 +324,30 @@ export default class Boss extends Phaser.Scene {
     }
 
     update(time: number, delta: number): void {    
-        if(!this.music.isPlaying&&!this.bossMusic.isPlaying){
-            this.music.play();        
-        }else if(!this.music.isPlaying&&!this.bossMusic.isPlaying&&this.triggered){
+        if(!this.music.isPlaying&&!this.bossMusic.isPlaying&&!this.triggered&&!this.player.pause){
+            this.music.play();   
+            this.bossMusic.stop(); 
+        }else if(!this.music.isPlaying&&!this.bossMusic.isPlaying&&this.triggered&&!this.player.pause){
+            this.triggered=true;
+            this.music.stop();
             this.bossMusic.play();        
+        }else if(this.triggered&&!this.bossMusic&&!this.player.pause){
+            this.music.stop();
         }
         this.player.update(time,delta);
         Overlay.updateScore(this.points,this.lives,true,(this.keyEsc.isDown&&this.player.scene!=undefined));
         if(this.keyEsc.isDown&&this.player.scene!=undefined){
+            this.player.pause=true;
+            this.music.stop()
+            this.bossMusic.stop();
             this.scene.launch("PauseHud");
-            if(this.triggered){
-                this.bossMusic.stop();
-            }else{
-                this.music.stop()
-            }
+            this.time.addEvent({
+                delay: 100, loop: false, callback: () => {
+                    this.player.pause=false;                    
+                }, callbackScope: this
+            });
             this.scene.pause();
+            
         }
         if(this.boss.life<=0){
             this.boss.destroy();
@@ -452,10 +467,13 @@ export default class Boss extends Phaser.Scene {
                 }, callbackScope: this
             });
         }else{
+            this.bossMusic.stop();
+            this.music.stop();
             this.time.addEvent({
-                delay: 100, loop: false, callback: () => {
+                delay: 200, loop: false, callback: () => {
                     Overlay.updateScore(this.points,this.lives,false,false);
-                    this.music.stop();
+                    this.music.stop()
+                    this.bossMusic.stop();
                     this.scene.restart();
                 }, callbackScope: this
             });
