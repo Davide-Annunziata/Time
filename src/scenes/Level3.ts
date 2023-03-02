@@ -2,7 +2,7 @@ import Player from "../components/Player";
 import Enemy from "../components/Enemy";
 import Bonus from "../components/Bonus";
 import Bcoin from "../components/Bcoin";
-import Level2 from "./Level2";
+import Overlay from "./Overlay";
 
 export default class Level3 extends Phaser.Scene {
     private mainCam:Phaser.Cameras.Scene2D.Camera;
@@ -24,11 +24,9 @@ export default class Level3 extends Phaser.Scene {
     private keyEsc:any;
     private groupBonus: Phaser.GameObjects.Group;
     private points:integer;
-    private textPoints:Phaser.GameObjects.BitmapText;
     private posX:integer;
     private posY:integer;
     private lives:integer;
-    private cuori:Phaser.GameObjects.Image;
     private saved:boolean;
     public enemyGroup: Phaser.GameObjects.Group;
     private cloud: Phaser.GameObjects.Image;
@@ -55,12 +53,6 @@ export default class Level3 extends Phaser.Scene {
         this.map = this.make.tilemap({ key: "level-3"});
         this.keyEsc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
         this.points=0;
-        this.textPoints=this.add.bitmapText(this.cameras.main.worldView.x+125,this.cameras.main.worldView.y+75, "arcade", "Frammenti: "+this.points, 18).setDepth(15)
-        .setAlpha(1)
-        .setDepth(15)
-        .setOrigin(0.5,0.5)
-        .setTint(0x0000);
-        this.cuori=this.add.image(this.cameras.main.worldView.x+75,this.cameras.main.worldView.y+35,"3cuori").setDepth(20);;
         this.mainCam = this.cameras.main;
         this.mainCam.setBounds(
             0, //x
@@ -99,7 +91,7 @@ export default class Level3 extends Phaser.Scene {
         this.setupObjects();
         this.x=false;
         this.createCollider();
-        
+        this.scene.launch("Layout");
     }
 
     create() {
@@ -114,13 +106,13 @@ export default class Level3 extends Phaser.Scene {
             }
             if (_tile.properties.exit == true&&this.points>=24) {	
                 this.player.anims.play('idle', true);
-                //TODO			
+                Overlay.updateScore(this.points,this.lives,false);	
                 this.music.destroy();
                 console.log("level completed");
                 Level3.completed=true;
                 this.player.pause=true;
                 let base=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+15,"base").setOrigin(0.5,0.5).setDepth(12);
-                this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-15,"continua").setInteractive().on("pointerdown",()=>{this.scene.remove;this.scene.start("LevelSelection")})
+                this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-15,"continua").setInteractive().on("pointerdown",()=>{Overlay.updateScore(this.points,this.lives,false);this.music.destroy();this.scene.remove;this.scene.start("LevelSelection")})
                 .setOrigin(0.5,0.5)
                 .setDepth(9)
                 .setScale(0.3)
@@ -172,7 +164,7 @@ export default class Level3 extends Phaser.Scene {
 
     update(time: number, delta: number): void {
         this.player.update(time,delta);
-
+        Overlay.updateScore(this.points,this.lives,true);
         if(this.keyEsc.isDown&&this.HUD.alpha==0&&this.player.scene!=undefined){
             this.createHUD();
             this.player.pause=true;
@@ -187,7 +179,6 @@ export default class Level3 extends Phaser.Scene {
             this.player._body.setAllowGravity(true)
             this.player._body.allowGravity=true;
         }
-        this.changePoint();
     
         if(this.player._body.position.x>3798&&this.player._body.position.y>610){
             this.mainCam.setBounds(
@@ -211,8 +202,12 @@ export default class Level3 extends Phaser.Scene {
         if(this.lives>=1){
             console.log("morto");
             this.lives--;
+            Overlay.updateScore(this.points,this.lives,true);
             this.mainCam.stopFollow();
-            this.player.destroy();
+            if(this.player.scene!=undefined){
+                this.player.destroy();
+            }
+            
             this.player.pause=true;
             
             this.time.addEvent({
@@ -226,6 +221,7 @@ export default class Level3 extends Phaser.Scene {
         }else{
             this.time.addEvent({
                 delay: 100, loop: false, callback: () => {
+                    Overlay.updateScore(this.points,this.lives,false);
                     this.music.destroy();
                     this.scene.restart();
                 }, callbackScope: this
@@ -238,7 +234,7 @@ export default class Level3 extends Phaser.Scene {
         this.HUD=this.add.container().setAlpha(0);
         this.base=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+15,"base").setOrigin(0.5,0.5).setDepth(12);
         this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-15,"continua").setInteractive().on("pointerdown",()=>{this.HUD.setAlpha(0);console.log(1);this.player.pause=false;}).setOrigin(0.5,0.5).setDepth(9).setScale(0.3);
-        this.esci=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+85,"esci").setInteractive().on("pointerdown",()=>{this.music.destroy();this.scene.remove;this.scene.start("LevelSelection")}).setOrigin(0.5,0.5).setDepth(9).setScale(0.3);
+        this.esci=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+85,"esci").setInteractive().on("pointerdown",()=>{Overlay.updateScore(this.points,this.lives,false);this.music.destroy();this.scene.remove;this.scene.start("LevelSelection")}).setOrigin(0.5,0.5).setDepth(9).setScale(0.3);
         this.HUD.add([this.base,this.continua,this.esci]);
         this.HUD.setAlpha(0).setDepth(15);
         
@@ -248,27 +244,11 @@ export default class Level3 extends Phaser.Scene {
                     this.HUD.destroy();
                     this.createHUD();
                     this.HUD.setAlpha(1);              
-                }       
+                }
+                    
+                
             }, callbackScope: this
         });
-    }
-
-
-    changePoint(){
-        this.textPoints.destroy();
-        this.textPoints=this.add.bitmapText(this.cameras.main.worldView.x+125,this.cameras.main.worldView.y+75, "arcade", "Frammenti: "+this.points, 18)
-        .setAlpha(1)
-        .setDepth(15)
-        .setOrigin(0.5,0.5)
-        .setTint(0x0000);
-        this.cuori.destroy();
-        if(this.lives==3){
-            this.cuori=this.add.image(this.cameras.main.worldView.x+75,this.cameras.main.worldView.y+35,"3cuori").setDepth(15);
-        }else if(this.lives==2){
-            this.cuori=this.add.image(this.cameras.main.worldView.x+55,this.cameras.main.worldView.y+35,"2cuori").setDepth(15);
-        }else if(this.lives==1){
-            this.cuori=this.add.image(this.cameras.main.worldView.x+35,this.cameras.main.worldView.y+35,"1cuore").setDepth(15);
-        }
     }
 
     addBonus(bonus: Bonus) {

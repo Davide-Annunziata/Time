@@ -1,6 +1,9 @@
 import Player from "../components/Player";
 import BossC from "../components/BossC";
 import Enemy from "../components/Enemy";
+import Bonus from "../components/Bonus";
+import Bcoin from "../components/Bcoin";
+import Overlay from "./Overlay";
 
 export default class Boss extends Phaser.Scene {
     private mainCam:Phaser.Cameras.Scene2D.Camera;
@@ -38,6 +41,9 @@ export default class Boss extends Phaser.Scene {
     private cuori:Phaser.GameObjects.Image;
     private saved:boolean;
     public enemyGroup: Phaser.GameObjects.Group;
+    private groupBonus: Phaser.GameObjects.Group;
+    private points:integer;
+
     constructor() {
         super({
         key: "Boss",
@@ -51,6 +57,7 @@ export default class Boss extends Phaser.Scene {
         this.posX=100;
         this.posY=775;
         this.lives=3;
+        this.points=0;
         this.saved=false;
         this.bg=this.add.image(0, 0,"bg2").setOrigin(0,0).setDepth(0);
         this.groupProj= this.add.group();
@@ -152,6 +159,7 @@ export default class Boss extends Phaser.Scene {
             enemy.destroy();
             },undefined,this
         )
+        this.groupBonus = this.add.group({ runChildUpdate: true });
         this.createCollider();
         this.setupObjects();
         
@@ -193,6 +201,7 @@ export default class Boss extends Phaser.Scene {
                 }
             }, callbackScope: this
         }); 
+        this.scene.launch("Layout");
     }
 
     create() {
@@ -215,7 +224,7 @@ export default class Boss extends Phaser.Scene {
                 this.player.jmp=true;
             }
             if (_tile.properties.exit == true) {	
-                //TODO			
+                Overlay.updateScore(this.points,this.lives,false);
                 this.music.destroy();
                 console.log("level completed");
                 this.player.pause=true;
@@ -242,8 +251,14 @@ export default class Boss extends Phaser.Scene {
             }
         },undefined,this
         );
-        
-    
+            
+        this.physics.add.overlap(this.player, this.groupBonus,(player: any, bonus: any)=>{
+            let music=this.sound.add("tick",{loop:false,volume:1});
+            music.play();
+            bonus.destroy();
+            this.points+=1
+        }, undefined, this);
+
         this.physics.add.collider(this.groupFire, this.player, (obj1: any, obj2: any) => {
             obj1.destroy();
             if(this.lives>1){
@@ -297,7 +312,7 @@ export default class Boss extends Phaser.Scene {
 
     update(time: number, delta: number): void {
         this.player.update(time,delta);     
-  
+        Overlay.updateScore(this.points,this.lives,true);
         if(this.boss.life<=0){
             this.boss.destroy();
             if(!this.win){
@@ -323,7 +338,7 @@ export default class Boss extends Phaser.Scene {
             this.player._body.setAllowGravity(true)
             this.player._body.allowGravity=true;
         }
-        this.changeLives();
+
     }
     
     createHUD(){
@@ -331,7 +346,7 @@ export default class Boss extends Phaser.Scene {
         this.HUD=this.add.container().setAlpha(0);
         this.base=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+15,"base").setOrigin(0.5,0.5).setDepth(12);
         this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-15,"continua").setInteractive().on("pointerdown",()=>{this.HUD.setAlpha(0);console.log(1);this.player.pause=false;}).setOrigin(0.5,0.5).setDepth(9).setScale(0.3);
-        this.esci=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+85,"esci").setInteractive().on("pointerdown",()=>{this.music.destroy();this.scene.remove;this.scene.start("LevelSelection")}).setOrigin(0.5,0.5).setDepth(9).setScale(0.3);
+        this.esci=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+85,"esci").setInteractive().on("pointerdown",()=>{Overlay.updateScore(this.points,this.lives,false);this.music.destroy();this.scene.remove;this.scene.start("LevelSelection")}).setOrigin(0.5,0.5).setDepth(9).setScale(0.3);
         this.HUD.add([this.base,this.continua,this.esci]);
         this.HUD.setAlpha(0).setDepth(15);
         
@@ -434,22 +449,12 @@ export default class Boss extends Phaser.Scene {
         });
     }
 
-    changeLives(){
-        this.cuori.destroy();
-        if(this.lives==3){
-            this.cuori=this.add.image(this.cameras.main.worldView.x+75,this.cameras.main.worldView.y+35,"3cuori").setDepth(20);;
-        }else if(this.lives==2){
-            this.cuori=this.add.image(this.cameras.main.worldView.x+55,this.cameras.main.worldView.y+35,"2cuori").setDepth(20);;
-        }else if(this.lives==1){
-            this.cuori=this.add.image(this.cameras.main.worldView.x+35,this.cameras.main.worldView.y+35,"1cuore").setDepth(20);;
-        }
-    }
-
     checkLives(){
         this.HUD.setAlpha(0)
         if(this.lives>=1){
             console.log("morto");
             this.lives--;
+            Overlay.updateScore(this.points,this.lives,true);
             this.mainCam.stopFollow();
             if(this.player.scene!=undefined){
                 this.player.destroy();
@@ -468,6 +473,7 @@ export default class Boss extends Phaser.Scene {
         }else{
             this.time.addEvent({
                 delay: 100, loop: false, callback: () => {
+                    Overlay.updateScore(this.points,this.lives,false);
                     this.music.destroy();
                     this.scene.restart();
                 }, callbackScope: this
@@ -475,7 +481,26 @@ export default class Boss extends Phaser.Scene {
         }
     }
 
+    addBonus(bonus: Bonus) {
+        this.groupBonus.add(bonus);
+    }
+
+    removeBonus(bonus: Bonus) {
+        this.groupBonus.remove(bonus, true, true);
+    }
+
     setupObjects(): void {
+		//recuperiamo il layer object dalla mappa di TILED
+		let _objLayer: Phaser.Tilemaps.ObjectLayer = this.map.getObjectLayer("gameObjects");
+		// controlliamo che _objLayer non sia null
+		if (_objLayer != null) {
+			// recuperiamo gli objects all'interno del layer
+			let _objects: any = _objLayer.objects as any[];
+			_objects.forEach((tile: Phaser.Tilemaps.Tile) => {
+                this.addBonus(new Bcoin({ scene: this,  x: tile.x, y: tile.y, key: "bonus-coin" })); 
+			});
+		}
+
 		let enLayer: Phaser.Tilemaps.ObjectLayer = this.map.getObjectLayer("enemy");
 		if (enLayer != null) {
 			let _objects: any = enLayer.objects as any[];
@@ -484,5 +509,19 @@ export default class Boss extends Phaser.Scene {
                 this.enemyGroup.add(new Enemy({ scene: this,  x: tile.x, y: tile.y, key: "enemy" })); 
 			});
 		}
+
+        this.physics.add.collider(this.enemyGroup,this.layer2,(enemy: any, _tile: any) => {
+            if (_tile.properties.worldBounds == true) {				
+                enemy.changeDirection();
+            }
+            },undefined,this
+        )
+
+        this.physics.add.overlap(this.enemyGroup,this.layer2,(enemy: any, _tile: any) => {
+            if (_tile.properties.worldBounds == true) {				
+                enemy.changeDirection();
+            }
+            },undefined,this
+        )
 	}
 }
