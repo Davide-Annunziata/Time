@@ -55,7 +55,7 @@ export default class Overlay extends Phaser.Scene{
             this.cuori.destroy();
             this.textPoints.setAlpha(0);
         }else{
-            this.textPoints.setText("Frammenti: "+ Overlay.points);
+            this.textPoints.setText("Frammenti:"+ Overlay.points);
         this.cuori.destroy();
         if(Overlay.lives==3){
             this.cuori=this.add.image(70,30,"3cuori").setDepth(15);

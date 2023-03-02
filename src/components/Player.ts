@@ -49,7 +49,8 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
 		this._body = <Phaser.Physics.Arcade.Body>this.body;
         this._body.setAllowGravity(true).setAccelerationY(130).setGravityY(300);
 	
-		this._body.setCollideWorldBounds(true).setSize(464,626);
+		this._body.setCollideWorldBounds(true).setSize(464,638);
+        this._body.setOffset(0,20)
 		this._cursors = this._scene.input.keyboard.createCursorKeys();
 		this.setDepth(10).setScale(0.1);
 		this.pause=false;
