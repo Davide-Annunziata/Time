@@ -9,6 +9,7 @@ import Level2  from "./scenes/Level2";
 import Level3 from "./scenes/Level3";
 import Boss from "./scenes/Boss";
 import Overlay from "./scenes/Overlay";
+import PauseHud from "./scenes/PauseHud";
 
 window.addEventListener("load", () => {
 
@@ -30,8 +31,9 @@ window.addEventListener("load", () => {
       Level1,
       Level2,
       Level3,
-      Boss ,
-      Overlay
+      Boss,
+      Overlay,
+      PauseHud
     ],
 
     physics: {

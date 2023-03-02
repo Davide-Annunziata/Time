@@ -2,21 +2,24 @@ export default class Overlay extends Phaser.Scene{
     public static points:integer;
     public static lives:integer;
     public static alive:boolean;
+    public static paused:boolean;
     private cuori:Phaser.GameObjects.Image;
     private textPoints:Phaser.GameObjects.BitmapText;
 
     constructor() {
         super({
-        key: "Layout",
+        key: "Overlay",
         });
     }
 
     preload() {}
     
     create(){ 
+        this.scene.setVisible(true,"Overlay");
         Overlay.lives=3;
         Overlay.points=0;
         Overlay.alive=true;
+        Overlay.paused=false;
         console.log("overlay");
         this.cuori=this.add.image(70,30,"1cuore").setDepth(20).setAlpha(1);
          
@@ -29,13 +32,22 @@ export default class Overlay extends Phaser.Scene{
         this.scene.bringToTop();
     };
 
-    static updateScore(points:number,lives:number,alive:boolean){
+    static updateScore(points:number,lives:number,alive:boolean,paused:boolean){
         Overlay.lives=lives;
         Overlay.points=points;
         Overlay.alive=alive;
+        Overlay.paused=paused;
     }
 
     update(time: number, delta: number): void {
+        if(Overlay.paused){
+            this.scene.moveBelow("Level1");
+            this.scene.moveBelow("Level2");
+            this.scene.moveBelow("Level3");
+            this.scene.moveBelow("Boss");
+        }else{
+            this.scene.bringToTop();
+        }
         if(!Overlay.alive){
             Overlay.lives=0;
             Overlay.points=0;

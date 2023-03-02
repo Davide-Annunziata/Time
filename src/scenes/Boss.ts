@@ -4,15 +4,14 @@ import Enemy from "../components/Enemy";
 import Bonus from "../components/Bonus";
 import Bcoin from "../components/Bcoin";
 import Overlay from "./Overlay";
+import PauseHud from "./PauseHud";
 
 export default class Boss extends Phaser.Scene {
     private mainCam:Phaser.Cameras.Scene2D.Camera;
     private player:Player;
     private music: Phaser.Sound.BaseSound;
     private bossMusic: Phaser.Sound.BaseSound;
-    private HUD :Phaser.GameObjects.Container;
     private continua :Phaser.GameObjects.Image;
-    private esci: Phaser.GameObjects.Image;
     private base: Phaser.GameObjects.Image;
     public completed:boolean=false;
   //i due riferimenti alla mappa di tile e al tileset
@@ -24,9 +23,7 @@ export default class Boss extends Phaser.Scene {
 	private layer2: Phaser.Tilemaps.TilemapLayer;
     private keyEsc:any;
     private bg:Phaser.GameObjects.Image;
-
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
-    private playing:boolean;
     private groupProj:Phaser.GameObjects.Group;
     private boss:BossC;
     private groupThunder:Phaser.GameObjects.Group;
@@ -43,6 +40,7 @@ export default class Boss extends Phaser.Scene {
     public enemyGroup: Phaser.GameObjects.Group;
     private groupBonus: Phaser.GameObjects.Group;
     private points:integer;
+    private x:boolean;
 
     constructor() {
         super({
@@ -51,6 +49,7 @@ export default class Boss extends Phaser.Scene {
     }
 
     preload() {      
+        this.scene.setVisible(true,"Boss");
         this.player= new Player({ scene: this, x: 100, y: 775, key: "player" });
         this.boss=new BossC(({ scene: this, x: 2335, y: 635, key: "player" }));
         this.triggered=false;
@@ -65,7 +64,7 @@ export default class Boss extends Phaser.Scene {
         this.music=this.sound.add("music3",{loop:true,volume:0.4});
         this.bossMusic=this.sound.add("music4",{loop:true,volume:0.4});
         this.music.play();
-        this.playing=false;
+        this.x=false;
         this.map = this.make.tilemap({ key: "level-4"});
         this.keyEsc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -166,7 +165,7 @@ export default class Boss extends Phaser.Scene {
         
         this.time.addEvent({
             delay: 3000, loop: true, callback: () => {
-                if(this.boss.life>0&&!this.player.pause&&this.triggered&&this.boss.scene!=undefined){
+                if(this.boss.life>0&&this.triggered&&this.boss.scene!=undefined){
                     this.thunder();
                     this.thunder();
                     let music=this.sound.add("fireball-sound",{loop:false,volume:1});
@@ -201,12 +200,11 @@ export default class Boss extends Phaser.Scene {
                 }
             }, callbackScope: this
         }); 
-        this.scene.launch("Layout");
+        this.scene.launch("Overlay");
     }
 
     create() {
         console.log("create:Boss");
-        this.createHUD();
     }
 
     createCollider(){
@@ -223,17 +221,26 @@ export default class Boss extends Phaser.Scene {
             if(this.player._body.blocked.down){
                 this.player.jmp=true;
             }
-            if (_tile.properties.exit == true) {	
-                Overlay.updateScore(this.points,this.lives,false);
-                this.music.destroy();
+            if (_tile.properties.exit == true&&this.points>=8&&this.player.scene!=undefined&&!this.x) {	
+                Overlay.updateScore(this.points,this.lives,false,false);
                 console.log("level completed");
                 this.player.pause=true;
                 let base=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+15,"base").setOrigin(0.5,0.5).setDepth(12);
-                this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-15,"continua").setInteractive().on("pointerdown",()=>{this.music.destroy();this.bossMusic.destroy();this.scene.remove;this.scene.start("LevelSelection")})
+                this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-15,"continua").setInteractive().on("pointerdown",()=>{Overlay.updateScore(this.points,this.lives,false,false);this.scene.remove;this.scene.start("LevelSelection");this.bossMusic.stop();})
                 .setOrigin(0.5,0.5)
                 .setDepth(9)
                 .setScale(0.3)
                 .setDepth(98);
+            }else if(_tile.properties.exit == true&&this.points<8&&this.player.scene!=undefined&&!this.x){
+                console.log("ho bisono di altri frammenti");
+                this.x=true;
+                let text:Phaser.GameObjects.Text=this.add.text(this.player.body.position.x-90,this.player.body.position.y-35,"ho bisogno di piu frammenti!",{fontSize:"12px"}).setTint(0x0000).setDepth(15);;  
+                this.time.addEvent({
+                    delay: 1000, loop: true, callback: () => {
+                        text.destroy(); 
+                        this.x=false;
+                    }, callbackScope: this
+                }); 
             }else if(_tile.properties.check==true&&!this.saved){
                 console.log("saved");
                 this.saved=true;
@@ -310,62 +317,34 @@ export default class Boss extends Phaser.Scene {
         }, undefined, this);
     }
 
-    update(time: number, delta: number): void {
-        this.player.update(time,delta);     
-        Overlay.updateScore(this.points,this.lives,true);
+    update(time: number, delta: number): void {    
+        if(!this.music.isPlaying&&!this.bossMusic.isPlaying){
+            this.music.play();        
+        }else if(!this.music.isPlaying&&!this.bossMusic.isPlaying&&this.triggered){
+            this.bossMusic.play();        
+        }
+        this.player.update(time,delta);
+        Overlay.updateScore(this.points,this.lives,true,(this.keyEsc.isDown&&this.player.scene!=undefined));
+        if(this.keyEsc.isDown&&this.player.scene!=undefined){
+            this.scene.launch("PauseHud");
+            if(this.triggered){
+                this.bossMusic.stop();
+            }else{
+                this.music.stop()
+            }
+            this.scene.pause();
+        }
         if(this.boss.life<=0){
             this.boss.destroy();
             if(!this.win){
                 this.createCloud();
             }
             this.win=true;
-        }      
-
-        if(this.keyEsc.isDown&&this.HUD.alpha==0&&this.player.scene!=undefined){
-            this.createHUD();
-            this.player.pause=true;
-            this.player.anims.play('idle', true);
-            this.HUD.setAlpha(1); 
-        }
-        if (this.cursors.space.isDown) {
-            this.createProj();
-        }
-        if(this.player.pause&&this.player._body.allowGravity==true){                 
-            this.player._body.setVelocity(0);                
-            this.player._body.setAllowGravity(false);
-            this.player._body.allowGravity=false;
-        }else if(!this.player.pause&&!this.player._body.allowGravity){
-            this.player._body.setAllowGravity(true)
-            this.player._body.allowGravity=true;
-        }
-
+        }          
     }
-    
-    createHUD(){
-        let y=this.player.body.position.y;
-        this.HUD=this.add.container().setAlpha(0);
-        this.base=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+15,"base").setOrigin(0.5,0.5).setDepth(12);
-        this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-15,"continua").setInteractive().on("pointerdown",()=>{this.HUD.setAlpha(0);console.log(1);this.player.pause=false;}).setOrigin(0.5,0.5).setDepth(9).setScale(0.3);
-        this.esci=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+85,"esci").setInteractive().on("pointerdown",()=>{Overlay.updateScore(this.points,this.lives,false);this.music.destroy();this.scene.remove;this.scene.start("LevelSelection")}).setOrigin(0.5,0.5).setDepth(9).setScale(0.3);
-        this.HUD.add([this.base,this.continua,this.esci]);
-        this.HUD.setAlpha(0).setDepth(15);
-        
-        this.time.addEvent({
-            delay: 150, loop: false, callback: () => {
-                if(this.HUD.alpha==1&&y!=this.player.body.position.y){
-                    this.HUD.destroy();
-                    this.createHUD();
-                    this.HUD.setAlpha(1);              
-                }
-                    
-                
-            }, callbackScope: this
-        });
-    }
-
 
     createProj(){
-        if(this.shot&&this.player.scene!=undefined&&!this.player.pause){
+        if(this.shot&&this.player.scene!=undefined){
             if(this.player.right){ 
             this.shot=false;
             let proj = this.physics.add.image(this.player.body.position.x+50,this.player.body.position.y+20,"logo-game" );
@@ -375,7 +354,7 @@ export default class Boss extends Phaser.Scene {
             this.groupProj.add(proj);
             this.time.addEvent({
                 delay: 1000, loop: false, callback: () => {
-                    if(this.boss.life>0&&!this.player.pause&&!this.shot){
+                    if(this.boss.life>0&&!this.shot){
                        this.shot=true;
                     } 
                 }, callbackScope: this
@@ -389,7 +368,7 @@ export default class Boss extends Phaser.Scene {
                 this.groupProj.add(proj);
                 this.time.addEvent({
                     delay: 1000, loop: false, callback: () => {
-                        if(this.boss.life>0&&!this.player.pause&&!this.shot){
+                        if(this.boss.life>0&&!this.shot){
                            this.shot=true;
                         } 
                     }, callbackScope: this
@@ -450,11 +429,10 @@ export default class Boss extends Phaser.Scene {
     }
 
     checkLives(){
-        this.HUD.setAlpha(0)
         if(this.lives>=1){
             console.log("morto");
             this.lives--;
-            Overlay.updateScore(this.points,this.lives,true);
+            Overlay.updateScore(this.points,this.lives,true,false);
             this.mainCam.stopFollow();
             if(this.player.scene!=undefined){
                 this.player.destroy();
@@ -473,7 +451,7 @@ export default class Boss extends Phaser.Scene {
         }else{
             this.time.addEvent({
                 delay: 100, loop: false, callback: () => {
-                    Overlay.updateScore(this.points,this.lives,false);
+                    Overlay.updateScore(this.points,this.lives,false,false);
                     this.music.destroy();
                     this.scene.restart();
                 }, callbackScope: this

@@ -3,15 +3,14 @@ import Enemy from "../components/Enemy";
 import Bonus from "../components/Bonus";
 import Bcoin from "../components/Bcoin";
 import Overlay from "./Overlay";
+import PauseHud from "./PauseHud";
 
 export default class Level3 extends Phaser.Scene {
     private mainCam:Phaser.Cameras.Scene2D.Camera;
     private player:Player;
     private music: Phaser.Sound.BaseSound;
     private jmp:boolean;
-    private HUD :Phaser.GameObjects.Container;
     private continua :Phaser.GameObjects.Image;
-    private esci: Phaser.GameObjects.Image;
     private base: Phaser.GameObjects.Image;
     public static completed:boolean;
   //i due riferimenti alla mappa di tile e al tileset
@@ -42,6 +41,7 @@ export default class Level3 extends Phaser.Scene {
         if(!Level3.completed){
             Level3.completed=false;
         }    
+        this.scene.setVisible(true,"Level3");
         this.player= new Player({ scene: this, x:55, y: 570, key: "player" });
         this.posX=55;
         this.posY=570;
@@ -91,12 +91,12 @@ export default class Level3 extends Phaser.Scene {
         this.setupObjects();
         this.x=false;
         this.createCollider();
-        this.scene.launch("Layout");
+        this.scene.launch("Overlay");
     }
 
     create() {
         console.log("create:Level3");
-        this.createHUD();
+        
     }
 
     createCollider(){
@@ -106,13 +106,12 @@ export default class Level3 extends Phaser.Scene {
             }
             if (_tile.properties.exit == true&&this.points>=24) {	
                 this.player.anims.play('idle', true);
-                Overlay.updateScore(this.points,this.lives,false);	
-                this.music.destroy();
+                Overlay.updateScore(this.points,this.lives,false,false);	
                 console.log("level completed");
                 Level3.completed=true;
                 this.player.pause=true;
                 let base=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+15,"base").setOrigin(0.5,0.5).setDepth(12);
-                this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-15,"continua").setInteractive().on("pointerdown",()=>{Overlay.updateScore(this.points,this.lives,false);this.music.destroy();this.scene.remove;this.scene.start("LevelSelection")})
+                this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-15,"continua").setInteractive().on("pointerdown",()=>{Overlay.updateScore(this.points,this.lives,false,false);this.scene.remove;this.scene.start("LevelSelection");this.music.stop();})
                 .setOrigin(0.5,0.5)
                 .setDepth(9)
                 .setScale(0.3)
@@ -163,23 +162,17 @@ export default class Level3 extends Phaser.Scene {
     }
 
     update(time: number, delta: number): void {
+        if(!this.music.isPlaying){
+            this.music.play();        
+        }
         this.player.update(time,delta);
-        Overlay.updateScore(this.points,this.lives,true);
-        if(this.keyEsc.isDown&&this.HUD.alpha==0&&this.player.scene!=undefined){
-            this.createHUD();
-            this.player.pause=true;
-            this.player.anims.play('idle', true);
-            this.HUD.setAlpha(1);
+        Overlay.updateScore(this.points,this.lives,true,(this.keyEsc.isDown&&this.player.scene!=undefined));
+        if(this.keyEsc.isDown&&this.player.scene!=undefined){
+            this.scene.launch("PauseHud");
+            this.music.stop()
+            this.scene.pause();
         }
-        if(this.player.pause&&this.player._body.allowGravity==true){                 
-            this.player._body.setVelocity(0);                
-            this.player._body.setAllowGravity(false);
-            this.player._body.allowGravity=false;
-        }else if(!this.player.pause&&!this.player._body.allowGravity){
-            this.player._body.setAllowGravity(true)
-            this.player._body.allowGravity=true;
-        }
-    
+
         if(this.player._body.position.x>3798&&this.player._body.position.y>610){
             this.mainCam.setBounds(
                 0, //x
@@ -198,11 +191,10 @@ export default class Level3 extends Phaser.Scene {
     }
 
     checkLives(){
-        this.HUD.setAlpha(0)
         if(this.lives>=1){
             console.log("morto");
             this.lives--;
-            Overlay.updateScore(this.points,this.lives,true);
+            Overlay.updateScore(this.points,this.lives,true,false);
             this.mainCam.stopFollow();
             if(this.player.scene!=undefined){
                 this.player.destroy();
@@ -221,34 +213,12 @@ export default class Level3 extends Phaser.Scene {
         }else{
             this.time.addEvent({
                 delay: 100, loop: false, callback: () => {
-                    Overlay.updateScore(this.points,this.lives,false);
+                    Overlay.updateScore(this.points,this.lives,false,false);
                     this.music.destroy();
                     this.scene.restart();
                 }, callbackScope: this
             });
         }
-    }
-
-    createHUD(){
-        let y=this.player.body.position.y;
-        this.HUD=this.add.container().setAlpha(0);
-        this.base=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+15,"base").setOrigin(0.5,0.5).setDepth(12);
-        this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-15,"continua").setInteractive().on("pointerdown",()=>{this.HUD.setAlpha(0);console.log(1);this.player.pause=false;}).setOrigin(0.5,0.5).setDepth(9).setScale(0.3);
-        this.esci=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+85,"esci").setInteractive().on("pointerdown",()=>{Overlay.updateScore(this.points,this.lives,false);this.music.destroy();this.scene.remove;this.scene.start("LevelSelection")}).setOrigin(0.5,0.5).setDepth(9).setScale(0.3);
-        this.HUD.add([this.base,this.continua,this.esci]);
-        this.HUD.setAlpha(0).setDepth(15);
-        
-        this.time.addEvent({
-            delay: 150, loop: false, callback: () => {
-                if(this.HUD.alpha==1&&y!=this.player.body.position.y){
-                    this.HUD.destroy();
-                    this.createHUD();
-                    this.HUD.setAlpha(1);              
-                }
-                    
-                
-            }, callbackScope: this
-        });
     }
 
     addBonus(bonus: Bonus) {
@@ -294,10 +264,8 @@ export default class Level3 extends Phaser.Scene {
             },undefined,this
         )
 	}
-
-    
-    createCloud(){
-        
+  
+    createCloud(){ 
         this.tweens.add({
             targets: this.cloud,
             duration: 4000,
