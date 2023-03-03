@@ -108,7 +108,7 @@ export default class Level3 extends Phaser.Scene {
             if(this.player._body.blocked.down){
                 this.player.jmp=true;
             }
-            if (_tile.properties.exit == true&&this.points>=25) {	
+            if (_tile.properties.exit == true&&this.points>=24) {	
                 this.player.anims.play('idle', true);
                 Overlay.updateScore(this.points,this.lives,false,false);	
                 console.log("level completed");
