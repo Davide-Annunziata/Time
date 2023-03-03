@@ -226,7 +226,7 @@ export default class Boss extends Phaser.Scene {
             if(this.player._body.blocked.down){
                 this.player.jmp=true;
             }
-            if (_tile.properties.exit == true&&this.points>=0&&this.player.scene!=undefined&&!this.x) {	
+            if (_tile.properties.exit == true&&this.points>=8&&this.player.scene!=undefined&&!this.x) {	
                 Overlay.updateScore(this.points,this.lives,false,false);
                 console.log("level completed");
                 let base=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+15,"youwin").setOrigin(0.5,0.5).setDepth(12);
