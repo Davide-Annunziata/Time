@@ -49,7 +49,7 @@ export default class Intro extends Phaser.Scene {
 
   createCredits(){
     this.creditsText.setInteractive(false);
-    let base:Phaser.GameObjects.Image=this.add.image(this.game.canvas.width/2,300,"base").setOrigin(0.5,0.5).setDepth(12).setInteractive().on("pointerdown",()=>{
+    let base:Phaser.GameObjects.Image=this.add.image(this.game.canvas.width/2,300,"credits").setOrigin(0.5,0.5).setDepth(12).setInteractive().on("pointerdown",()=>{
       base.destroy();
       this.creditsText.setInteractive(true);
     });       
@@ -57,7 +57,7 @@ export default class Intro extends Phaser.Scene {
 
   createHow(){
     this.howToPlayText.setInteractive(false);
-    let base:Phaser.GameObjects.Image=this.add.image(this.game.canvas.width/2,300,"base").setOrigin(0.5,0.5).setDepth(12).setInteractive().on("pointerdown",()=>{
+    let base:Phaser.GameObjects.Image=this.add.image(this.game.canvas.width/2,300,"comeGiocare").setOrigin(0.5,0.5).setDepth(12).setInteractive().on("pointerdown",()=>{
       base.destroy();
       this.howToPlayText.setInteractive(true);
     });       
