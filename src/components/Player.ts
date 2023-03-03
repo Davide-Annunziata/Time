@@ -15,7 +15,6 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
 	private _velocity: number = 200
     public pause:boolean;
     public jmp:boolean;
-    private keyW:Phaser.Input.Keyboard.Key;
     private keyA:Phaser.Input.Keyboard.Key;
     private keyD:Phaser.Input.Keyboard.Key;
 
@@ -54,7 +53,6 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
 		this._cursors = this._scene.input.keyboard.createCursorKeys();
 		this.setDepth(10).setScale(0.1);
 		this.pause=false;
-        this.keyW = this._scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
         this.keyA = this._scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         this.keyD = this._scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
 		this._scene.add.existing(this);
@@ -100,9 +98,9 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
             }
             
             //se il il cursore in alto è premuto
-            if (this._cursors.up.isDown||this.keyW.isDown) {
+            if (this._cursors.up.isDown||this._cursors.space.isDown) {
                 if(this.jmp&&!this.pause){
-                    if (this._cursors.up.isDown||this.keyW.isDown) {
+                    if (this._cursors.up.isDown||this._cursors.space.isDown) {
                         this.jmp=false
                         this._body.setVelocityY(-300)
                     }
@@ -111,7 +109,7 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
             }
             
 
-            if (!this._cursors.left.isDown && !this._cursors.right.isDown && !this._cursors.up.isDown && !this._cursors.down.isDown&&!this.keyA.isDown&&!this.keyW.isDown&&!this.keyD.isDown) {                  
+            if (!this._cursors.left.isDown && !this._cursors.right.isDown && !this._cursors.up.isDown && !this._cursors.down.isDown&&!this.keyA.isDown&&!this._cursors.space.isDown&&!this.keyD.isDown) {                  
                 this._body.setVelocityX(0);                
                 this.anims.play('idle', true);
             }

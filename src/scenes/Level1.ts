@@ -165,9 +165,12 @@ export default class Level1 extends Phaser.Scene{
             this.points+=1
         }, undefined, this);
 
-        this.physics.add.collider(this.player, this.enemyGroup,(player: any, enemy: any)=>{       
-            if(this.player._body.blocked.down&&!this.player._body.blocked.up&&!this.player._body.blocked.right&&!this.player._body.blocked.left){
-                console.log(1)
+        this.physics.add.overlap(this.player, this.enemyGroup,(player: any, enemy: any)=>{       
+            if(!this.player._body.blocked.down&&!this.player._body.blocked.up&&this.player._body.blocked.right&&!this.player._body.blocked.left){
+                enemy.destroy();
+            }else if(!this.player._body.blocked.down&&!this.player._body.blocked.up&&!this.player._body.blocked.right&&this.player._body.blocked.left){
+                enemy.destroy();
+            }else if(!this.player._body.blocked.down&&!this.player._body.blocked.up&&!this.player._body.blocked.right&&!this.player._body.blocked.left){
                 enemy.destroy();
             }else{
                 this.checkLives();

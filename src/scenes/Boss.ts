@@ -41,6 +41,7 @@ export default class Boss extends Phaser.Scene {
     private groupBonus: Phaser.GameObjects.Group;
     private points:integer;
     private x:boolean;
+    private keyE:Phaser.Input.Keyboard.Key;
 
     constructor() {
         super({
@@ -49,6 +50,7 @@ export default class Boss extends Phaser.Scene {
     }
 
     preload() {      
+        this.keyE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
         this.scene.setVisible(true,"Boss");
         this.player= new Player({ scene: this, x: 100, y: 775, key: "player" });
         this.boss=new BossC(({ scene: this, x: 2335, y: 635, key: "player" }));
@@ -208,9 +210,12 @@ export default class Boss extends Phaser.Scene {
     }
 
     createCollider(){
-        this.physics.add.collider(this.player, this.enemyGroup,(player: any, enemy: any)=>{       
-            if(this.player._body.blocked.down&&!this.player._body.blocked.up&&!this.player._body.blocked.right&&!this.player._body.blocked.left){
-                console.log(1)
+        this.physics.add.overlap(this.player, this.enemyGroup,(player: any, enemy: any)=>{       
+            if(!this.player._body.blocked.down&&!this.player._body.blocked.up&&this.player._body.blocked.right&&!this.player._body.blocked.left){
+                enemy.destroy();
+            }else if(!this.player._body.blocked.down&&!this.player._body.blocked.up&&!this.player._body.blocked.right&&this.player._body.blocked.left){
+                enemy.destroy();
+            }else if(!this.player._body.blocked.down&&!this.player._body.blocked.up&&!this.player._body.blocked.right&&!this.player._body.blocked.left){
                 enemy.destroy();
             }else{
                 this.checkLives();
@@ -224,10 +229,9 @@ export default class Boss extends Phaser.Scene {
             if (_tile.properties.exit == true&&this.points>=8&&this.player.scene!=undefined&&!this.x) {	
                 Overlay.updateScore(this.points,this.lives,false,false);
                 console.log("level completed");
-                this.player.pause=true;
                 let base=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+15,"base").setOrigin(0.5,0.5).setDepth(12);
-                this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-15,"continua").setInteractive().on("pointerdown",()=>{Overlay.updateScore(this.points,this.lives,false,false);this.music.stop();
-                this.bossMusic.stop();this.scene.remove;this.scene.start("LevelSelection");})
+                this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-15,"continua").setInteractive().on("pointerdown",()=>{this.bossMusic.pause();
+                    this.music.pause();Overlay.updateScore(this.points,this.lives,false,false);this.scene.remove;this.scene.start("LevelSelection");})
                 .setOrigin(0.5,0.5)
                 .setDepth(9)
                 .setScale(0.3)
@@ -356,7 +360,7 @@ export default class Boss extends Phaser.Scene {
             }
             this.win=true;
         }          
-        if (this.cursors.space.isDown) {
+        if (this.keyE.isDown) {
             this.createProj();
         }
     }
