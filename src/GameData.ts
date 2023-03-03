@@ -61,7 +61,7 @@ export let GameData: any = {
     { name: "thunder", path: "assets/images/thunder.png" },
     { name: "fireball", path: "assets/images/fireball.png" },
     { name: "base", path: "assets/images/base.png" },
-    { name: "continua", path: "assets/images/continua.png" },
+    { name: "continua", path: "assets/images/contiuna.png" },
     { name: "esci", path: "assets/images/esci.png" },
     { name: "1cuore", path: "assets/images/1cuore.png" },
     { name: "2cuori", path: "assets/images/2cuori.png" },
@@ -74,8 +74,10 @@ export let GameData: any = {
     { name: "x", path: "assets/images/x.png" },
     { name: "freccia", path: "assets/images/freccia.png" },
     { name: "grotta", path: "assets/map/toppa.png" },
-    { name: "credits", path: "assets/images/credis.png" },
-    { name: "comeGiocare", path: "assets/images/comegiocare.png" }
+    { name: "credits", path: "assets/images/credits.png" },
+    { name: "comeGiocare", path: "assets/images/comegiocare.png" },
+    { name: "clessidra", path: "assets/images/clessidra.png" },
+    { name: "youwin", path: "assets/images/youwin.png" }
 
   ],
   atlas: [],

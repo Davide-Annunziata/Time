@@ -44,7 +44,7 @@ export default class Level3 extends Phaser.Scene {
             Level3.completed=false;
         }    
         this.scene.setVisible(true,"Level3");
-        this.player= new Player({ scene: this, x:3700, y: 570, key: "player" });
+        this.player= new Player({ scene: this, x:55, y: 570, key: "player" });
         this.posX=55;
         this.posY=570;
         this.lives=3;
@@ -53,7 +53,7 @@ export default class Level3 extends Phaser.Scene {
         this.music=this.sound.add("music3",{loop:true,volume:0.3});
         this.music.play();
         this.bg=this.add.image(0, -200,"bg3").setOrigin(0,0).setDepth(2);
-        this.grotta=this.add.image(450, 987,"grotta").setOrigin(1,1).setDepth(7);
+        this.grotta=this.add.image(4500, 987,"grotta").setOrigin(1,1).setDepth(4);
         this.map = this.make.tilemap({ key: "level-3"});
         this.keyEsc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
         this.points=0;
@@ -108,14 +108,14 @@ export default class Level3 extends Phaser.Scene {
             if(this.player._body.blocked.down){
                 this.player.jmp=true;
             }
-            if (_tile.properties.exit == true&&this.points>=24) {	
+            if (_tile.properties.exit == true&&this.points>=25) {	
                 this.player.anims.play('idle', true);
                 Overlay.updateScore(this.points,this.lives,false,false);	
                 console.log("level completed");
                 Level3.completed=true;
                 this.player.pause=true;
-                let base=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+15,"base").setOrigin(0.5,0.5).setDepth(12);
-                this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-15,"continua").setInteractive().on("pointerdown",()=>{Overlay.updateScore(this.points,this.lives,false,false);this.scene.remove;this.scene.start("LevelSelection");this.music.stop();})
+                let base=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+15,"youwin").setOrigin(0.5,0.5).setDepth(12);
+                this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+25,"continua").setInteractive().on("pointerdown",()=>{Overlay.updateScore(this.points,this.lives,false,false);this.scene.remove;this.scene.start("LevelSelection");this.music.stop();})
                 .setOrigin(0.5,0.5)
                 .setDepth(9)
                 .setScale(0.3)
@@ -159,12 +159,12 @@ export default class Level3 extends Phaser.Scene {
             this.points+=1
         }, undefined, this);
 
-        this.physics.add.overlap(this.player, this.enemyGroup,(player: any, enemy: any)=>{       
-            if(!this.player._body.blocked.down&&!this.player._body.blocked.up&&this.player._body.blocked.right&&!this.player._body.blocked.left){
+        this.physics.add.collider(this.player, this.enemyGroup,(player: any, enemy: any)=>{       
+            if(this.player._body.blocked.down&&!this.player._body.blocked.up&&this.player._body.blocked.right&&!this.player._body.blocked.left&&!this.player.jmp){
                 enemy.destroy();
-            }else if(!this.player._body.blocked.down&&!this.player._body.blocked.up&&!this.player._body.blocked.right&&this.player._body.blocked.left){
+            }else if(this.player._body.blocked.down&&!this.player._body.blocked.up&&!this.player._body.blocked.right&&this.player._body.blocked.left&&!this.player.jmp){
                 enemy.destroy();
-            }else if(!this.player._body.blocked.down&&!this.player._body.blocked.up&&!this.player._body.blocked.right&&!this.player._body.blocked.left){
+            }else if(this.player._body.blocked.down&&!this.player._body.blocked.up&&!this.player._body.blocked.right&&!this.player._body.blocked.left&&!this.player.jmp){
                 enemy.destroy();
             }else{
                 this.checkLives();

@@ -210,12 +210,12 @@ export default class Boss extends Phaser.Scene {
     }
 
     createCollider(){
-        this.physics.add.overlap(this.player, this.enemyGroup,(player: any, enemy: any)=>{       
-            if(!this.player._body.blocked.down&&!this.player._body.blocked.up&&this.player._body.blocked.right&&!this.player._body.blocked.left){
+        this.physics.add.collider(this.player, this.enemyGroup,(player: any, enemy: any)=>{       
+            if(this.player._body.blocked.down&&!this.player._body.blocked.up&&this.player._body.blocked.right&&!this.player._body.blocked.left&&!this.player.jmp){
                 enemy.destroy();
-            }else if(!this.player._body.blocked.down&&!this.player._body.blocked.up&&!this.player._body.blocked.right&&this.player._body.blocked.left){
+            }else if(this.player._body.blocked.down&&!this.player._body.blocked.up&&!this.player._body.blocked.right&&this.player._body.blocked.left&&!this.player.jmp){
                 enemy.destroy();
-            }else if(!this.player._body.blocked.down&&!this.player._body.blocked.up&&!this.player._body.blocked.right&&!this.player._body.blocked.left){
+            }else if(this.player._body.blocked.down&&!this.player._body.blocked.up&&!this.player._body.blocked.right&&!this.player._body.blocked.left&&!this.player.jmp){
                 enemy.destroy();
             }else{
                 this.checkLives();
@@ -226,12 +226,12 @@ export default class Boss extends Phaser.Scene {
             if(this.player._body.blocked.down){
                 this.player.jmp=true;
             }
-            if (_tile.properties.exit == true&&this.points>=8&&this.player.scene!=undefined&&!this.x) {	
+            if (_tile.properties.exit == true&&this.points>=0&&this.player.scene!=undefined&&!this.x) {	
                 Overlay.updateScore(this.points,this.lives,false,false);
                 console.log("level completed");
-                let base=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+15,"base").setOrigin(0.5,0.5).setDepth(12);
-                this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY-15,"continua").setInteractive().on("pointerdown",()=>{this.bossMusic.pause();
-                    this.music.pause();Overlay.updateScore(this.points,this.lives,false,false);this.scene.remove;this.scene.start("LevelSelection");})
+                let base=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+15,"youwin").setOrigin(0.5,0.5).setDepth(12);
+                this.continua=this.add.image(this.cameras.main.worldView.centerX,this.cameras.main.worldView.centerY+25,"continua").setInteractive().on("pointerdown",()=>{this.bossMusic.pause();
+                    this.music.pause();Overlay.updateScore(this.points,this.lives,false,false);this.scene.remove;this.scene.start("Finale");})
                 .setOrigin(0.5,0.5)
                 .setDepth(9)
                 .setScale(0.3)
