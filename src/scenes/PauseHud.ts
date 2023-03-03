@@ -27,7 +27,7 @@ export default class PauseHud extends Phaser.Scene{
             this.esci.setAlpha(0);
             }
         ).setOrigin(0.5,0.5).setDepth(14).setScale(0.3).setAlpha(1);
-        this.esci=this.add.image(1024/2,300+50,"esci").setInteractive().on("pointerdown",()=>{
+        this.esci=this.add.image(1024/2,300+70,"esci").setInteractive().on("pointerdown",()=>{
             this.base.setAlpha(0);
             this.continua.setAlpha(0);
             this.esci.setAlpha(0);

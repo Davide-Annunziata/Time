@@ -130,7 +130,7 @@ export default class Level2 extends Phaser.Scene {
             }else if(_tile.properties.exit == true&&this.points<15&&this.player.scene!=undefined&&!this.x){
                 console.log("ho bisono di altri frammenti");
                 this.x=true;
-                let text:Phaser.GameObjects.Text=this.add.text(this.player.body.position.x-90,this.player.body.position.y-70,"ho bisogno di piu frammenti!",{fontSize:"12px"}).setTint(0x0000).setDepth(15);  
+                let text:Phaser.GameObjects.Text=this.add.text(this.player.body.position.x-90,this.player.body.position.y-70,"ho bisogno di piu frammenti!",{fontSize:"12px"}).setTint(0xFF0000).setDepth(15);  
                 this.time.addEvent({
                     delay: 1000, loop: true, callback: () => {
                         text.destroy(); 

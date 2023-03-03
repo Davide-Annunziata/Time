@@ -53,14 +53,14 @@ export default class Boss extends Phaser.Scene {
         this.keyE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
         this.scene.setVisible(true,"Boss");
         this.player= new Player({ scene: this, x: 100, y: 775, key: "player" });
-        this.boss=new BossC(({ scene: this, x: 2335, y: 635, key: "player" }));
+        this.boss=new BossC(({ scene: this, x: 2335, y: 645, key: "player" }));
         this.triggered=false;
         this.posX=100;
         this.posY=775;
         this.lives=3;
         this.points=0;
         this.saved=false;
-        this.bg=this.add.image(0, 0,"bg2").setOrigin(0,0).setDepth(0);
+        this.bg=this.add.image(0, 0,"bg4").setOrigin(0,0).setDepth(0);
         this.groupProj= this.add.group();
         this.physics.add.existing(this.player);
         this.music=this.sound.add("music3",{loop:true,volume:0.4});
@@ -239,7 +239,7 @@ export default class Boss extends Phaser.Scene {
             }else if(_tile.properties.exit == true&&this.points<8&&this.player.scene!=undefined&&!this.x){
                 console.log("ho bisono di altri frammenti");
                 this.x=true;
-                let text:Phaser.GameObjects.Text=this.add.text(this.player.body.position.x-90,this.player.body.position.y-35,"ho bisogno di piu frammenti!",{fontSize:"12px"}).setTint(0x0000).setDepth(15);;  
+                let text:Phaser.GameObjects.Text=this.add.text(this.player.body.position.x-90,this.player.body.position.y-35,"ho bisogno di piu frammenti!",{fontSize:"12px"}).setTint(0xFF0000).setDepth(15);;  
                 this.time.addEvent({
                     delay: 1000, loop: true, callback: () => {
                         text.destroy(); 
@@ -262,6 +262,8 @@ export default class Boss extends Phaser.Scene {
                 if(this.lives<0){
                     this.music.stop();
                     this.bossMusic.stop();
+                    this.music.stop();
+                    this.bossMusic.stop();
                 }
                 this.player.pause=true;
                 this.checkLives()
@@ -278,52 +280,12 @@ export default class Boss extends Phaser.Scene {
 
         this.physics.add.collider(this.groupFire, this.player, (obj1: any, obj2: any) => {
             obj1.destroy();
-            if(this.lives>1){
-                console.log("morto");
-                this.lives--;
-                this.mainCam.stopFollow();
-                this.player.destroy();
-                this.player.pause=true;
-                this.time.addEvent({
-                    delay: 1000, loop: false, callback: () => {
-                        this.player= new Player({ scene: this, x:this.posX, y: this.posY, key: "player" });
-                        this.createCollider();
-                        this.player.setAlpha(1);
-                        this.mainCam.startFollow(this.player);
-                    }, callbackScope: this
-                });
-            }else{
-                this.time.addEvent({
-                    delay: 100, loop: false, callback: () => {
-                        this.scene.restart();
-                    }, callbackScope: this
-                });
-            }
+            this.checkLives();
         }, undefined, this);
         
         this.physics.add.collider(this.groupThunder, this.player, (obj1: any, obj2: any) => {
             obj1.destroy();
-            if(this.lives>1){
-                console.log("morto");
-                this.lives--;
-                this.mainCam.stopFollow();
-                this.player.destroy();
-                this.player.pause=true;
-                this.time.addEvent({
-                    delay: 1000, loop: false, callback: () => {
-                        this.player= new Player({ scene: this, x:this.posX, y: this.posY, key: "player" });
-                        this.createCollider();
-                        this.player.setAlpha(1);
-                        this.mainCam.startFollow(this.player);
-                    }, callbackScope: this
-                });
-            }else{
-                this.time.addEvent({
-                    delay: 100, loop: false, callback: () => {
-                        this.scene.restart();
-                    }, callbackScope: this
-                });
-            }
+            this.checkLives();
         }, undefined, this);
     }
 
@@ -369,8 +331,8 @@ export default class Boss extends Phaser.Scene {
         if(this.shot&&this.player.scene!=undefined){
             if(this.player.right){ 
             this.shot=false;
-            let proj = this.physics.add.image(this.player.body.position.x+50,this.player.body.position.y+20,"logo-game" );
-            proj.setOrigin(0).setDepth(9).setScale(0.1).setDepth(10);
+            let proj = this.physics.add.image(this.player.body.position.x+50,this.player.body.position.y+20,"freccia" );
+            proj.setOrigin(0).setDepth(9).setScale(0.06).setDepth(10);
             proj.body.allowGravity = false;
             proj.body.setVelocityX(300);
             this.groupProj.add(proj);
@@ -383,8 +345,9 @@ export default class Boss extends Phaser.Scene {
             });     
             }else{
                 this.shot=false;
-                let proj = this.physics.add.image(this.player.body.position.x-10,this.player.body.position.y+20,"logo-game" );
-                proj.setOrigin(1,0).setDepth(9).setScale(0.1).setDepth(10);
+                let proj = this.physics.add.image(this.player.body.position.x-10,this.player.body.position.y+20,"freccia");
+                proj.setOrigin(1,0).setDepth(9).setScale(0.06).setDepth(10);
+                proj.setFlipX(true);
                 proj.body.allowGravity = false;
                 proj.body.setVelocityX(-300);
                 this.groupProj.add(proj);
@@ -411,6 +374,7 @@ export default class Boss extends Phaser.Scene {
     fireBall(){
         if(this.boss.scene!=undefined){
             let fireBall = this.physics.add.image(this.boss.body.position.x+50,this.boss.body.position.y+20,"fireball").setDepth(10);
+            fireBall.setFlipX(true);
             fireBall.setOrigin(0).setDepth(9).setScale(2);
             fireBall.body.setCircle(7, 4, 5)
             fireBall.body.allowGravity=false;
@@ -476,6 +440,7 @@ export default class Boss extends Phaser.Scene {
             this.time.addEvent({
                 delay: 200, loop: false, callback: () => {
                     Overlay.updateScore(this.points,this.lives,false,false);
+                    this.player.pause=true;
                     this.music.stop()
                     this.bossMusic.stop();
                     this.scene.restart();

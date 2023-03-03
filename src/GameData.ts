@@ -57,6 +57,7 @@ export let GameData: any = {
     {name: "bg2", path: "assets/map/sfondo2.jpg" },
     {name: "bg3", path: "assets/map/sfondo3.jpg" },
     {name: "bg4", path: "assets/map/sfondo4.jpg" },
+    {name: "select", path: "assets/map/select.png" },
     { name: "thunder", path: "assets/images/thunder.png" },
     { name: "fireball", path: "assets/images/fireball.png" },
     { name: "base", path: "assets/images/base.png" },
@@ -69,7 +70,13 @@ export let GameData: any = {
     { name: "1", path: "assets/images/1.png" },
     { name: "2", path: "assets/images/2.png" },
     { name: "3", path: "assets/images/3.png" },
-    { name: "4", path: "assets/images/4.png" }
+    { name: "4", path: "assets/images/4.png" },
+    { name: "x", path: "assets/images/x.png" },
+    { name: "freccia", path: "assets/images/freccia.png" },
+    { name: "grotta", path: "assets/map/toppa.png" },
+    { name: "credits", path: "assets/images/credis.png" },
+    { name: "comeGiocare", path: "assets/images/comegiocare.png" }
+
   ],
   atlas: [],
   sounds: [{

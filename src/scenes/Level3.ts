@@ -30,6 +30,8 @@ export default class Level3 extends Phaser.Scene {
     public enemyGroup: Phaser.GameObjects.Group;
     private cloud: Phaser.GameObjects.Image;
     private x:boolean;
+    private bg:Phaser.GameObjects.Image;
+    private grotta:Phaser.GameObjects.Image;
 
     constructor() {
         super({
@@ -42,14 +44,16 @@ export default class Level3 extends Phaser.Scene {
             Level3.completed=false;
         }    
         this.scene.setVisible(true,"Level3");
-        this.player= new Player({ scene: this, x:55, y: 570, key: "player" });
+        this.player= new Player({ scene: this, x:3700, y: 570, key: "player" });
         this.posX=55;
         this.posY=570;
         this.lives=3;
         this.saved=false;
         this.physics.add.existing(this.player);
-        this.music=this.sound.add("music3",{loop:true,volume:0.1});
+        this.music=this.sound.add("music3",{loop:true,volume:0.3});
         this.music.play();
+        this.bg=this.add.image(0, -200,"bg3").setOrigin(0,0).setDepth(2);
+        this.grotta=this.add.image(450, 987,"grotta").setOrigin(1,1).setDepth(7);
         this.map = this.make.tilemap({ key: "level-3"});
         this.keyEsc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
         this.points=0;
@@ -119,7 +123,7 @@ export default class Level3 extends Phaser.Scene {
             }else if(_tile.properties.exit == true&&this.points<24&&this.player.scene!=undefined&&!this.x){
                 console.log("ho bisono di altri frammenti");
                 this.x=true;
-                let text:Phaser.GameObjects.Text=this.add.text(this.player.body.position.x-90,this.player.body.position.y-35,"ho bisogno di piu frammenti!",{fontSize:"12px"}).setTint(0x0000).setDepth(15);;  
+                let text:Phaser.GameObjects.Text=this.add.text(this.player.body.position.x-90,this.player.body.position.y-35,"ho bisogno di piu frammenti!",{fontSize:"12px"}).setTint(0xFF0000).setDepth(15);;  
                 this.time.addEvent({
                     delay: 1000, loop: true, callback: () => {
                         text.destroy(); 
