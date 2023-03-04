@@ -192,7 +192,6 @@ export default class Level1 extends Phaser.Scene{
                 }, callbackScope: this
             });
             this.scene.pause();
-            
         }
     }
     
