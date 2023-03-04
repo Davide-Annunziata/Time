@@ -179,13 +179,12 @@ export default class Level3 extends Phaser.Scene {
             this.player.pause=true;
             this.music.stop()
             this.scene.launch("PauseHud");
+            this.scene.pause();
             this.time.addEvent({
                 delay: 100, loop: false, callback: () => {
                     this.player.pause=false;                    
                 }, callbackScope: this
             });
-            this.scene.pause();
-            
         }
         if(this.player._body.position.x>3798&&this.player._body.position.y>610){
             this.mainCam.setBounds(

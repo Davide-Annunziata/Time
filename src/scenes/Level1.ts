@@ -186,12 +186,12 @@ export default class Level1 extends Phaser.Scene{
             this.player.pause=true;
             this.music.stop()
             this.scene.launch("PauseHud");
+            this.scene.pause();
             this.time.addEvent({
                 delay: 100, loop: false, callback: () => {
                     this.player.pause=false;                    
                 }, callbackScope: this
             });
-            this.scene.pause();
         }
     }
     

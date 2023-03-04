@@ -300,15 +300,13 @@ export default class Boss extends Phaser.Scene {
         if(this.keyEsc.isDown&&this.player.scene!=undefined){
             this.player.pause=true;
             this.music.stop()
-            this.bossMusic.stop();
             this.scene.launch("PauseHud");
+            this.scene.pause();
             this.time.addEvent({
                 delay: 100, loop: false, callback: () => {
                     this.player.pause=false;                    
                 }, callbackScope: this
             });
-            this.scene.pause();
-            
         }
         if(this.boss.life<=0){
             this.boss.destroy();
