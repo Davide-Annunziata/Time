@@ -38,7 +38,7 @@ export default class Level2 extends Phaser.Scene {
 
     preload() {      
         if(!Level2.completed){
-            Level2.completed=false;
+            Level2.completed=true;
         }
         PauseHud.setLevel(2);
         this.scene.setVisible(true,"Level2");
@@ -50,7 +50,7 @@ export default class Level2 extends Phaser.Scene {
         this.music=this.sound.add("music2",{loop:true,volume:.3});
         this.music.play();
         this.map = this.make.tilemap({ key: "level-2"});
-        this.bg=this.add.image(0,0,"bg2").setOrigin(0,0).setDepth(2);
+        this.bg=this.add.image(0,100,"bg2").setOrigin(0,0).setDepth(2);
         this.keyEsc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
         this.points=0;
         this.mainCam = this.cameras.main;
