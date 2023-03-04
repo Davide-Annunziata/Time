@@ -210,8 +210,8 @@ export default class Boss extends Phaser.Scene {
     }
 
     createCollider(){
-        this.physics.add.collider(this.player, this.enemyGroup,(player: any, enemy: any)=>{       
-            if(this.player._body.blocked.down&&!enemy._body.blocked.left&&!enemy._body.blocked.right){
+        this.physics.add.collider(this.player, this.enemyGroup,(player: any, enemy: any)=>{    
+            if(((this.player._body.position.y+11.3)<(enemy._body.position.y))&&this.player._body.blocked.down){
                 enemy.destroy();
             }else{
                 this.checkLives();
