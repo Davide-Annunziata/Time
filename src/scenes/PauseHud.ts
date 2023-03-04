@@ -1,4 +1,4 @@
-import Overlay from "./Overlay";
+
 
 export default class PauseHud extends Phaser.Scene{
     private continua :Phaser.GameObjects.Image;
