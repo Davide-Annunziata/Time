@@ -115,7 +115,7 @@ export default class Level1 extends Phaser.Scene{
             if(this.player._body.blocked.down){
                 this.player.jmp=true;
             }
-            if (_tile.properties.exit == true&&this.points>=15) {	
+            if (_tile.properties.exit == true&&this.points>=0) {	
                 Overlay.updateScore(this.points,this.lives,false,false)
                 this.player.anims.play('idle', true);		
                 console.log("level completed");
@@ -166,11 +166,7 @@ export default class Level1 extends Phaser.Scene{
         }, undefined, this);
 
         this.physics.add.collider(this.player, this.enemyGroup,(player: any, enemy: any)=>{       
-            if(this.player._body.blocked.down&&!this.player._body.blocked.up&&this.player._body.blocked.right&&!this.player._body.blocked.left&&!this.player.jmp){
-                enemy.destroy();
-            }else if(this.player._body.blocked.down&&!this.player._body.blocked.up&&!this.player._body.blocked.right&&this.player._body.blocked.left&&!this.player.jmp){
-                enemy.destroy();
-            }else if(this.player._body.blocked.down&&!this.player._body.blocked.up&&!this.player._body.blocked.right&&!this.player._body.blocked.left&&!this.player.jmp){
+            if(this.player._body.blocked.down&&!enemy._body.blocked.left&&!enemy._body.blocked.right){
                 enemy.destroy();
             }else{
                 this.checkLives();

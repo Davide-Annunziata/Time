@@ -14,11 +14,13 @@ export default class Intro extends Phaser.Scene {
   preload() {
   }
   create() {
+    let bg=this.add.image(0, 0,"principale").setOrigin(0,0).setDepth(0);
     let music: Phaser.Sound.BaseSound=this.sound.add("music0",{loop:true,volume:0.4});
     music.play();
-    this.logo=this.add.image(this.game.canvas.width/2-5,100,"logo-game").setScale(1);
+    this.logo=this.add.image(this.game.canvas.width/2-5,100,"logo-game").setScale(1).setDepth(1);
     this.playText=this.add.text(this.game.canvas.width/2-5,230,"PLAY",{fontSize:"40px"})
     .setColor("Black")
+    .setDepth(1)
     .setOrigin(0.5,0.5)
     .setInteractive()
     .on("pointerdown",()=>{
@@ -30,6 +32,7 @@ export default class Intro extends Phaser.Scene {
     this.creditsText=this.add.text(this.game.canvas.width/2,300,"Credits",{fontSize:"40px"})
     .setColor("Black")
     .setOrigin(0.5,0.5)
+    .setDepth(1)
     .setInteractive()
     .on("pointerdown",()=>{
       console.log("credits");
@@ -39,6 +42,7 @@ export default class Intro extends Phaser.Scene {
     this.howToPlayText=this.add.text(this.game.canvas.width/2,360,"How to play",{fontSize:"40px"})
     .setColor("Black")
     .setOrigin(0.5,0.5)
+    .setDepth(1)
     .setInteractive()
     .on("pointerdown",()=>{
       console.log("come giocare");
