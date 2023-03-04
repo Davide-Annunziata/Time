@@ -258,8 +258,6 @@ export default class Boss extends Phaser.Scene {
                 if(this.lives<0){
                     this.music.stop();
                     this.bossMusic.stop();
-                    this.music.stop();
-                    this.bossMusic.stop();
                 }
                 this.player.pause=true;
                 this.checkLives()
@@ -431,12 +429,11 @@ export default class Boss extends Phaser.Scene {
                 }, callbackScope: this
             });
         }else{
-            this.bossMusic.stop();
-            this.music.stop();
+            this.player.destroy();
+            this.player.pause=true;
             this.time.addEvent({
-                delay: 200, loop: false, callback: () => {
-                    Overlay.updateScore(this.points,this.lives,false,false);
-                    this.player.pause=true;
+                delay: 500, loop: false, callback: () => {
+                    Overlay.updateScore(this.points,this.lives,false,false);  
                     this.music.stop()
                     this.bossMusic.stop();
                     this.scene.restart();

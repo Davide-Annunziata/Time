@@ -216,10 +216,11 @@ export default class Level1 extends Phaser.Scene{
                 }, callbackScope: this
             });
         }else{
-            this.music.stop();
+            this.player.destroy();
+            this.player.pause=true;
             this.time.addEvent({
-                delay: 200, loop: false, callback: () => {
-                    Overlay.updateScore(this.points,this.lives,false,false);
+                delay: 500, loop: false, callback: () => {
+                    Overlay.updateScore(this.points,this.lives,false,false);  
                     this.music.stop()
                     this.scene.restart();
                 }, callbackScope: this
