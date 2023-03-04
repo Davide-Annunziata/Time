@@ -49,7 +49,8 @@ export default class Boss extends Phaser.Scene {
         });
     }
 
-    preload() {      
+    preload() { 
+        PauseHud.setLevel(4);     
         this.keyE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
         this.scene.setVisible(true,"Boss");
         this.player= new Player({ scene: this, x: 100, y: 775, key: "player" });
@@ -210,12 +211,8 @@ export default class Boss extends Phaser.Scene {
     }
 
     createCollider(){
-        this.physics.add.collider(this.player, this.enemyGroup,(player: any, enemy: any)=>{       
-            if(this.player._body.blocked.down&&!this.player._body.blocked.up&&this.player._body.blocked.right&&!this.player._body.blocked.left&&!this.player.jmp){
-                enemy.destroy();
-            }else if(this.player._body.blocked.down&&!this.player._body.blocked.up&&!this.player._body.blocked.right&&this.player._body.blocked.left&&!this.player.jmp){
-                enemy.destroy();
-            }else if(this.player._body.blocked.down&&!this.player._body.blocked.up&&!this.player._body.blocked.right&&!this.player._body.blocked.left&&!this.player.jmp){
+        this.physics.add.collider(this.player, this.enemyGroup,(player: any, enemy: any)=>{    
+            if(((this.player._body.position.y+11.3)<(enemy._body.position.y))&&this.player._body.blocked.down){
                 enemy.destroy();
             }else{
                 this.checkLives();
@@ -260,8 +257,6 @@ export default class Boss extends Phaser.Scene {
                 console.log("saved");
             }else if(_tile.properties.kill==true){
                 if(this.lives<0){
-                    this.music.stop();
-                    this.bossMusic.stop();
                     this.music.stop();
                     this.bossMusic.stop();
                 }
@@ -435,12 +430,11 @@ export default class Boss extends Phaser.Scene {
                 }, callbackScope: this
             });
         }else{
-            this.bossMusic.stop();
-            this.music.stop();
+            this.player.destroy();
+            this.player.pause=true;
             this.time.addEvent({
-                delay: 200, loop: false, callback: () => {
-                    Overlay.updateScore(this.points,this.lives,false,false);
-                    this.player.pause=true;
+                delay: 500, loop: false, callback: () => {
+                    Overlay.updateScore(this.points,this.lives,false,false);  
                     this.music.stop()
                     this.bossMusic.stop();
                     this.scene.restart();

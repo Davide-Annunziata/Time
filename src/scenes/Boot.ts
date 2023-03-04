@@ -10,7 +10,7 @@ export default class Boot extends Phaser.Scene {
 
   preload() {
 
-    this.load.image("phaser", "assets/images/phaser.png");
+    this.load.image("phaser", "assets/images/GameTitle.png");
     this.load.bitmapFont(
       "arcade",
       "assets/fonts/arcade.png",
@@ -21,6 +21,7 @@ export default class Boot extends Phaser.Scene {
 
   init() { 
   }
+
 
   create() {
     console.log("create:boot");

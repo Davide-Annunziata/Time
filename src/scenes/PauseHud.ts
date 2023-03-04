@@ -1,27 +1,36 @@
-import Overlay from "./Overlay";
+
 
 export default class PauseHud extends Phaser.Scene{
     private continua :Phaser.GameObjects.Image;
     private esci: Phaser.GameObjects.Image;
     private base: Phaser.GameObjects.Image;
-    private level:integer;
+    private static level:integer;
     constructor(level:integer) {
         super({
         key: "PauseHud",
         });
-        this.level=level
+        
     }
 
     preload() {}
     
+    static setLevel(x:integer){
+        PauseHud.level=x;
+    };
     create(){ 
         this.scene.bringToTop();
         this.base=this.add.image(1024/2,300+15,"base").setOrigin(0.5,0.5).setDepth(12).setAlpha(1);
         this.continua=this.add.image(1024/2,300-20,"continua").setInteractive().on("pointerdown",()=>{
-            this.scene.resume("Level1");
-            this.scene.resume("Level2");
-            this.scene.resume("Level3");
-            this.scene.resume("Boss");
+            if(PauseHud.level==1){
+                this.scene.resume("Level1");
+            }else if(PauseHud.level==2){
+                this.scene.resume("Level2");
+            }else if(PauseHud.level==3){
+                this.scene.resume("Level3");
+            }else if(PauseHud.level==4){
+                this.scene.resume("Boss");
+            }
+            
             this.base.setAlpha(0);
             this.continua.setAlpha(0);
             this.esci.setAlpha(0);

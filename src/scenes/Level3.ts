@@ -43,6 +43,7 @@ export default class Level3 extends Phaser.Scene {
         if(!Level3.completed){
             Level3.completed=false;
         }    
+        PauseHud.setLevel(3);
         this.scene.setVisible(true,"Level3");
         this.player= new Player({ scene: this, x:55, y: 570, key: "player" });
         this.posX=55;
@@ -108,7 +109,7 @@ export default class Level3 extends Phaser.Scene {
             if(this.player._body.blocked.down){
                 this.player.jmp=true;
             }
-            if (_tile.properties.exit == true&&this.points>=24) {	
+            if (_tile.properties.exit == true&&this.points>=24 ) {	
                 this.player.anims.play('idle', true);
                 Overlay.updateScore(this.points,this.lives,false,false);	
                 console.log("level completed");
@@ -159,12 +160,8 @@ export default class Level3 extends Phaser.Scene {
             this.points+=1
         }, undefined, this);
 
-        this.physics.add.collider(this.player, this.enemyGroup,(player: any, enemy: any)=>{       
-            if(this.player._body.blocked.down&&!this.player._body.blocked.up&&this.player._body.blocked.right&&!this.player._body.blocked.left&&!this.player.jmp){
-                enemy.destroy();
-            }else if(this.player._body.blocked.down&&!this.player._body.blocked.up&&!this.player._body.blocked.right&&this.player._body.blocked.left&&!this.player.jmp){
-                enemy.destroy();
-            }else if(this.player._body.blocked.down&&!this.player._body.blocked.up&&!this.player._body.blocked.right&&!this.player._body.blocked.left&&!this.player.jmp){
+        this.physics.add.collider(this.player, this.enemyGroup,(player: any, enemy: any)=>{    
+            if(((this.player._body.position.y+11.3)<(enemy._body.position.y))&&this.player._body.blocked.down){
                 enemy.destroy();
             }else{
                 this.checkLives();
@@ -228,10 +225,11 @@ export default class Level3 extends Phaser.Scene {
                 }, callbackScope: this
             });
         }else{
-            this.music.stop();
+            this.player.destroy();
+            this.player.pause=true;
             this.time.addEvent({
-                delay: 200, loop: false, callback: () => {
-                    Overlay.updateScore(this.points,this.lives,false,false);
+                delay: 500, loop: false, callback: () => {
+                    Overlay.updateScore(this.points,this.lives,false,false);  
                     this.music.stop()
                     this.scene.restart();
                 }, callbackScope: this

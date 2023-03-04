@@ -4,7 +4,7 @@ export let GameData: any = {
     gameWidth: 1024,
     gameHeight: 600,
     bgColor: "#ffffff",
-    debug: true,
+    debug: false,
   },
 
   preloader: {
@@ -53,6 +53,7 @@ export let GameData: any = {
   images: [
     {name:"logo-game", path:"assets/images/GameTitle.png"},
     {name: "bg0", path: "assets/map/sfondo1.jpg" },
+    {name: "principale", path: "assets/images/MENUPRINCIPALE.jpg" },
     {name: "bg1", path: "assets/map/sfondo1.jpg" },
     {name: "bg2", path: "assets/map/sfondo2.jpg" },
     {name: "bg3", path: "assets/map/sfondo3.jpg" },

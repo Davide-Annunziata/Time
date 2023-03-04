@@ -13,7 +13,7 @@ export default class Preloader extends Phaser.Scene {
   }
 
   preload() {
-    this.cameras.main.setBackgroundColor("#ffffff");
+    this.cameras.main.setBackgroundColor("0x00000");
     this._progress = this.add.graphics();
     this.loadAssets();
   }
@@ -57,7 +57,7 @@ export default class Preloader extends Phaser.Scene {
       this._progress.fillRect(0, 530, GameData.globals.width * value, 70);
       this._loading.setText("Loading...");
     });
-
+    
     this.load.on("complete", () => {
       console.log("complete")
       this._loading.setText("Tap to start!");

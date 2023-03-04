@@ -40,6 +40,7 @@ export default class Level2 extends Phaser.Scene {
         if(!Level2.completed){
             Level2.completed=false;
         }
+        PauseHud.setLevel(2);
         this.scene.setVisible(true,"Level2");
         this.player= new Player({ scene: this, x: 80, y:885, key: "player" });
         this.posX=80;
@@ -165,12 +166,8 @@ export default class Level2 extends Phaser.Scene {
             this.points+=1
         }, undefined, this);
 
-        this.physics.add.collider(this.player, this.enemyGroup,(player: any, enemy: any)=>{       
-            if(this.player._body.blocked.down&&!this.player._body.blocked.up&&this.player._body.blocked.right&&!this.player._body.blocked.left&&!this.player.jmp){
-                enemy.destroy();
-            }else if(this.player._body.blocked.down&&!this.player._body.blocked.up&&!this.player._body.blocked.right&&this.player._body.blocked.left&&!this.player.jmp){
-                enemy.destroy();
-            }else if(this.player._body.blocked.down&&!this.player._body.blocked.up&&!this.player._body.blocked.right&&!this.player._body.blocked.left&&!this.player.jmp){
+        this.physics.add.collider(this.player, this.enemyGroup,(player: any, enemy: any)=>{    
+            if(((this.player._body.position.y+11.3)<(enemy._body.position.y))&&this.player._body.blocked.down){
                 enemy.destroy();
             }else{
                 this.checkLives();
@@ -220,10 +217,11 @@ export default class Level2 extends Phaser.Scene {
                 }, callbackScope: this
             });
         }else{
-            this.music.stop();
+            this.player.destroy();
+            this.player.pause=true;
             this.time.addEvent({
-                delay: 200, loop: false, callback: () => {
-                    Overlay.updateScore(this.points,this.lives,false,false);
+                delay: 500, loop: false, callback: () => {
+                    Overlay.updateScore(this.points,this.lives,false,false);  
                     this.music.stop()
                     this.scene.restart();
                 }, callbackScope: this
