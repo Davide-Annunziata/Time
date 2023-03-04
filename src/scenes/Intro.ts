@@ -36,7 +36,7 @@ export default class Intro extends Phaser.Scene {
       this.createCredits()
     });
 
-    this.howToPlayText=this.add.text(this.game.canvas.width/2,360,"Come giocare",{fontSize:"40px"})
+    this.howToPlayText=this.add.text(this.game.canvas.width/2,360,"How to play",{fontSize:"40px"})
     .setColor("Black")
     .setOrigin(0.5,0.5)
     .setInteractive()
