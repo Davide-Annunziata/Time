@@ -43,7 +43,7 @@ export default class Finale extends Phaser.Scene {
     }
   
     update(){
-        this.img.rotation+=0.0037;   
+        this.img.rotation+=0.0088;   
     }
   }
   

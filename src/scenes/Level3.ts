@@ -53,7 +53,7 @@ export default class Level3 extends Phaser.Scene {
         this.physics.add.existing(this.player);
         this.music=this.sound.add("music3",{loop:true,volume:0.3});
         this.music.play();
-        this.bg=this.add.image(0, -180,"bg3").setOrigin(0,0).setDepth(2);
+        this.bg=this.add.image(0, -250,"bg3").setOrigin(0,0).setDepth(2);
         this.grotta=this.add.image(4500, 987,"grotta").setOrigin(1,1).setDepth(4);
         this.map = this.make.tilemap({ key: "level-3"});
         this.keyEsc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
