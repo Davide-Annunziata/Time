@@ -100,8 +100,7 @@ export default class Level3 extends Phaser.Scene {
     }
 
     create() {
-        console.log("create:Level3");
-        
+        console.log("create:Level3");  
     }
 
     createCollider(){
