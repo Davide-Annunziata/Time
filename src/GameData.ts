@@ -4,7 +4,7 @@ export let GameData: any = {
     gameWidth: 1024,
     gameHeight: 600,
     bgColor: "#ffffff",
-    debug: false,
+    debug: true,
   },
 
   preloader: {
@@ -18,9 +18,9 @@ export let GameData: any = {
     {
     name: "player",
     path: "assets/images/player.png",
-    width: 454, 
-    height: 669,
-    frames: 3
+    width: 52, 
+    height: 67,
+    frames: 12
     },{
       name: "tilemap-extruded",
       path: "assets/map/tilemap-extruded.png",

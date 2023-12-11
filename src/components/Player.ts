@@ -20,8 +20,8 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
 
 	//array di oggetti per la creazione dell’animazione
 	private _animations: Array<{ key: string, frames: Array<number>, frameRate: number, yoyo: boolean, repeat: number }> = [
-	{ key: "move", frames: [0, 1, 2], frameRate: 10, yoyo: false, repeat: -1 },
-	{ key: "idle", frames: [0], frameRate: 10, yoyo: false, repeat: -1 }
+	{ key: "move", frames: [0, 1, 2,3,4,5,6,7], frameRate: 10, yoyo: false, repeat: -1 },
+	{ key: "idle", frames: [8,9,10,11,12,13], frameRate: 10, yoyo: false, repeat: -1 }
 	];
 
     public right:boolean;
@@ -48,10 +48,10 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
 		this._body = <Phaser.Physics.Arcade.Body>this.body;
         this._body.setAllowGravity(true).setAccelerationY(130).setGravityY(300);
 	
-		this._body.setCollideWorldBounds(true).setSize(430,638);
-        this._body.setOffset(5,20)
+		this._body.setCollideWorldBounds(true).setSize(52,67);
+        this._body.setOffset(0,0)
 		this._cursors = this._scene.input.keyboard.createCursorKeys();
-		this.setDepth(10).setScale(0.1);
+		this.setDepth(10).setScale(0.9);
 		this.pause=false;
         this.keyA = this._scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         this.keyD = this._scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
