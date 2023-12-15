@@ -48,7 +48,7 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
 		this._body = <Phaser.Physics.Arcade.Body>this.body;
         this._body.setAllowGravity(true).setAccelerationY(130).setGravityY(300);
 	
-		this._body.setCollideWorldBounds(true).setSize(52,67);
+		this._body.setCollideWorldBounds(true).setSize(43,67);
         this._body.setOffset(0,0)
 		this._cursors = this._scene.input.keyboard.createCursorKeys();
 		this.setDepth(10).setScale(0.9);
@@ -78,6 +78,7 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
     update(time: number, delta: number) {
         if(this.scene!=undefined&&!this.pause){
             if (this._cursors.left.isDown||this.keyA.isDown) {
+                this._body.setOffset(5,0);
                 this._body.setAccelerationY(130);
                 this.right=false;
                 this.setFlipX(true);
@@ -88,6 +89,7 @@ export default class Player extends Phaser.GameObjects.Sprite implements IPlayer
                 }
             //se il il cursore destro è premuto
             if (this._cursors.right.isDown||this.keyD.isDown) {
+                this._body.setOffset(0,0);               
                 this._body.setAccelerationY(130);
                 this.right=true;
                 this.setFlipX(false);
