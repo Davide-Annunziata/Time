@@ -1,4 +1,4 @@
-<h3 align="center">Questo è gioco fatto per il progetto Phaser Jem a tema tempo.</h3>
+<h3 align="center">Questo è gioco svuluppato per la competizione Phaser Jem a tema tempo.</h3>
 
 <h3 align="left">Come avviare il gioco:</h3>
 <p align="left"> 1)Scaricare il file zip ed estrarlo.
